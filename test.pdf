@@ -1,0 +1,68 @@
+%PDF-1.3
+%äüöß
+1 0 obj
+<<
+/Type /Catalog
+/PageLayout /SinglePage
+/OpenAction [5 0 R /XYZ null null 1.000000]
+/ViewerPreferences 3 0 R
+/Pages 4 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/CreationDate (D:20231111142339Z)
+>>
+endobj
+
+3 0 obj
+<<
+/Type /ViewerPreferences
+/FitWindow 
+>>
+endobj
+
+4 0 obj
+<<
+/Type /Pages
+/Kids [5 0 R]
+/Count 1
+>>
+endobj
+
+5 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/MediaBox [0 0 0 0]
+/Resources <<
+/ProcSet [/PDF /Text /ImageC]
+>>
+/Contents 6 0 R
+>>
+endobj
+
+6 0 obj
+
+endobj
+
+xref
+0 7
+0000000000 00000 n
+0000000019 00000 n
+0000000163 00000 n
+0000000216 00000 n
+0000000273 00000 n
+0000000330 00000 n
+0000000464 00000 n
+trailer
+<<
+/Size 7
+/Root 1 0 R
+/Info 2 0 R
+/ID [<8bd4b733f1c3c537ea4ccdb7aaeebd15> <8bd4b733f1c3c537ea4ccdb7aaeebd15>]
+>>
+startxref
+464
+%%EOF

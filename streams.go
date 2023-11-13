@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bytes"
+	"compress/flate"
 	"io"
 )
 
 type TPDFStream struct {
-	TPDFDocumentObject
+	DocObj
 	CompressionProhibited bool
 	Items                 []Encoder
 }
@@ -21,26 +21,9 @@ func (s *TPDFStream) Encode(st PDFWriter) {
 	}
 }
 
-func NewPDFStream(doc *TPDFDocument) *TPDFStream{
-	return &TPDFStream{TPDFDocumentObject: NewTPDFDocumentObject(doc)}
+func NewPDFStream(doc *Document) *TPDFStream{
+	return &TPDFStream{DocObj: NewDocObj(doc)}
 }
-
-type TPDFMemoryStream struct {
-	TPDFDocumentObject
-	buffer bytes.Buffer 		
-}
-
-func NewPDFMemoryStream(doc *TPDFDocument, r io.Reader) *TPDFMemoryStream{
-	ms:= &TPDFMemoryStream{TPDFDocumentObject: NewTPDFDocumentObject(doc)}
-	if r != nil {
-		io.Copy(&ms.buffer, r) 
-	}	
-	return ms 
-}
-
-func (s *TPDFMemoryStream) Encode(st PDFWriter) {
-	st.Write(s.buffer.Bytes())
-}	
 
 
 //FIXME: check implementation 
@@ -61,9 +44,74 @@ func (xs *TXMPStream) Encode(st PDFWriter) {
 }
 
 type TXMPStream struct {
-	TPDFDocumentObject
+	DocObj
 }
 
-func NewTXMPStream(doc *TPDFDocument) *TXMPStream{
-	return &TXMPStream{TPDFDocumentObject: NewTPDFDocumentObject(doc)}
+func NewTXMPStream(doc *Document) *TXMPStream{
+	return &TXMPStream{DocObj: NewDocObj(doc)}
 }
+
+func compressStream(dest io.Writer, src io.Reader /*, compressionLevel int*/) error {
+	zw, err := flate.NewWriter(dest, flate.DefaultCompression)
+	if err!= nil {
+		return err
+	}
+	_, err= io.Copy(zw, src)
+	return err 
+}
+
+// procedure CompressString(const AFrom: rawbytestring; var ATo: rawbytestring);
+// var
+//   lStreamFrom : TStringStream;
+//   lStreamTo  : TStringStream;
+// begin
+//   { TODO : Possible improvement would be to perform this compression directly on
+//            the string as a buffer, and not go through the stream stage. }
+//   lStreamFrom := TStringStream.Create(AFrom);
+//   try
+//     lStreamTo  := TStringStream.Create('');
+//     try
+//       lStreamFrom.Position := 0;
+//       lStreamTo.Size := 0;
+//       CompressStream(lStreamFrom, lStreamTo);
+//       ATo  := lStreamTo.DataString;
+//     finally
+//       lStreamTo.Free;
+//     end;
+//   finally
+//     lStreamFrom.Free;
+//   end;
+// end;
+
+// procedure DecompressStream(AFrom: TStream; ATo: TStream);
+// Const
+//   BufSize = 1024; // 1K
+// Type
+//   TBuffer = Array[0..BufSize-1] of byte;
+// var
+//   d: TDecompressionStream;
+//   Count : Integer;
+//   Buffer : TBuffer;
+
+// begin
+//   if AFrom.Size = 0 then
+//   begin
+//     ATo.Size := 0;
+//     Exit; //==>
+//   end;
+//   FillMem(@Buffer, SizeOf(TBuffer), 0);
+
+//   AFrom.Position := 0;
+//   AFrom.Seek(0,soFromEnd);
+//   D:=TDecompressionStream.Create(AFrom, False);
+//   try
+//     repeat
+//        Count:=D.Read(Buffer,BufSize);
+//        ATo.WriteBuffer(Buffer,Count);
+//      until (Count<BufSize);
+//   finally
+//     d.Free;
+//   end;
+// end;
+
+

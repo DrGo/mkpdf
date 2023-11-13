@@ -21,19 +21,10 @@ const (
 	clWaterMark = 0xF0F0F0
 )
 
-type (
-	TPDFPaperType        int
-	TPDFPaperOrientation int
-	TPDFPenStyle         int
-	TPDFLineCapStyle     int
-	TPDFLineJoinStyle    int
-	TPDFPageLayout       int
-	TPDFUnitOfMeasure    int
-	TPDFOption           int
-)
+type PaperType int
 
 const (
-	ptCustom TPDFPaperType = iota
+	ptCustom PaperType = iota
 	ptA4
 	ptA5
 	ptLetter
@@ -46,46 +37,60 @@ const (
 	ptB5
 )
 
+type PaperOrientation int
+
 const (
-	ppoPortrait TPDFPaperOrientation = iota
+	ppoPortrait PaperOrientation = iota
 	ppoLandscape
 )
 
+type PenStyle int
+
 const (
-	ppsSolid TPDFPenStyle = iota
+	ppsSolid PenStyle = iota
 	ppsDash
 	ppsDot
 	ppsDashDot
 	ppsDashDotDot
 )
 
+type LineCapStyle int
+
 const (
-	plcsButtCap TPDFLineCapStyle = iota
+	plcsButtCap LineCapStyle = iota
 	plcsRoundCap
 	plcsProjectingSquareCap
 )
 
+type LineJoinStyle int
+
 const (
-	pljsMiterJoin TPDFLineJoinStyle = iota
+	pljsMiterJoin LineJoinStyle = iota
 	pljsRoundJoin
 	pljsBevelJoin
 )
 
+type PageLayout int
+
 const (
-	lSingle TPDFPageLayout = iota
+	lSingle PageLayout = iota
 	lTwo
 	lContinuous
 )
 
+type UnitOfMeasure int
+
 const (
-	uomInches TPDFUnitOfMeasure = iota
+	uomInches UnitOfMeasure = iota
 	uomMillimeters
 	uomCentimeters
 	uomPixels
 )
 
+type Option int
+
 const (
-	poOutLine TPDFOption = iota
+	poOutLine Option = iota
 	poCompressText
 	poCompressFonts
 	poCompressImages
@@ -99,35 +104,34 @@ const (
 	poUTF16info
 )
 
-type TPDFImageCompression int
+type ImageCompression int
 
 const (
-	icNone TPDFImageCompression = iota
+	icNone ImageCompression = iota
 	icDeflate
 	icJPEG
 )
 
-type TPDFImageStreamOption int
+type ImageStreamOption int
 
 const (
-	isoCompressed TPDFImageStreamOption = iota
+	isoCompressed ImageStreamOption = iota
 	isoTransparent
 )
 
-type TCompressionLevel int
+// uses flate pkg constants
+type CompressionLevel int
 
 const (
-	clDefault TCompressionLevel = iota
-	// other compression levels can be added here, if needed
+	clDefault CompressionLevel = iota
 )
 
 const (
-	cInchToMM   = 25.4
-	cInchToCM   = 2.54
-	cDefaultDPI = 72
-	BEZIER      = 0.5522847498 // 4/3 * (sqrt(2) - 1)
-	BufSize     = 1024
-	CRLF                       = "\r\n"
+	cInchToMM                  = 25.4
+	cInchToCM                  = 2.54
+	cDefaultDPI                = 72
+	BEZIER                     = 0.5522847498 // 4/3 * (sqrt(2) - 1)
+	CRLF                       = "\r\n"       //  EOL marker regardless of OS
 	PDF_VERSION                = "%PDF-1.3"
 	PDF_BINARY_BLOB            = "%" + "\xC3\xA4" + "\xC3\xBC" + "\xC3\xB6" + "\xC3\x9F"
 	PDF_FILE_END               = "%%EOF"
@@ -144,27 +148,29 @@ const (
 	rsErrNoFontDefined         = `No Font was set - please use SetFont() first.`
 	rsErrNoImageReader         = `Unsupported image format - no image reader available.`
 	rsErrUnknownStdFont        = `Unknown standard PDF font name <%s>.`
+
+	ProducerID = "mkPDF"
 )
-type TPDFDimensions struct {
-	B, T, L, R int 
+
+type Dimensions struct {
+	B, T, L, R float64
 }
 
-type TPDFPaper struct {
-	H, W       int 
-	Printable TPDFDimensions
+type Paper struct {
+	H, W      int
+	Printable Dimensions
 }
 
-func (a TPDFDimensions) Equal(b TPDFDimensions) bool {
+func (a Dimensions) Equal(b Dimensions) bool {
 	return a.B == b.B && a.T == b.T && a.L == b.L && a.R == b.R
 }
 
-func (a TPDFPaper) Equal(b TPDFPaper) bool {
+func (a Paper) Equal(b Paper) bool {
 	return a.H == b.H && a.W == b.W && a.Printable.Equal(b.Printable)
 }
 
-
 // Height,Width,Top,Left,Right,Bottom (units in pixels)
-var PDFPaperDims = map[TPDFPaperType][6]int{
+var PDFPaperDims = map[PaperType][6]int{
 	ptCustom:    {0, 0, 0, 0, 0, 0},
 	ptA4:        {842, 595, 10, 11, 586, 822},
 	ptA5:        {595, 420, 10, 11, 407, 588},
@@ -179,8 +185,7 @@ var PDFPaperDims = map[TPDFPaperType][6]int{
 }
 var PageLayoutNames = []string{"SinglePage", "TwoColumnLeft", "OneColumn"}
 
-
-// not using pi to avoid importing math 
+// not using pi to avoid importing math
 const (
 	_DegToRad = 0.017453292519943295769236907684886127134428718885417 // N[Pi/180, 50]
 	_RadToDeg = 57.295779513082320876798154814105170332405472466564   // N[180/Pi, 50]

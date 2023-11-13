@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type TPDFInfos struct {
+type PDFInfo struct {
 	ApplicationName string
 	Author          string
 	CreationDate    time.Time
@@ -13,62 +13,40 @@ type TPDFInfos struct {
 	Keywords        string
 }
 
-func NewTPDFInfos() *TPDFInfos {
-	return &TPDFInfos{
-		Producer: "fpGUI Toolkit 1.4",
-		Keywords: "",
-	}
+func NewPDFInfo() *PDFInfo {
+	return &PDFInfo{Producer: ProducerID}
 }
 
-type TPDFSection struct {
+type Section struct {
 	Title string
-	Pages []*TPDFPage
+	Pages []*Page
 }
 
-func (section *TPDFSection) PageCount() int {
-	return len(section.Pages)
+func (section *Section) PageCount() int     { return len(section.Pages) }
+func (section *Section) Get(idx int) *Page  { return section.Pages[idx] }
+func (section *Section) Count() int         { return len(section.Pages) }
+func (section *Section) AddPage(page *Page) { eadd(&section.Pages, page) }
+
+type SectionList struct {
+	Sections []*Section
 }
 
-func (section *TPDFSection) Get(AIndex int) *TPDFPage {
-	return section.Pages[AIndex]
-}
-
-func (section *TPDFSection) Count() int {
-	return len(section.Pages)
-}
-
-func (section *TPDFSection) AddPage(APage *TPDFPage) {
-	eadd(&section.Pages, APage)
-}
-
-type TPDFSectionList struct {
-	Sections []*TPDFSection
-}
-
-func (list *TPDFSectionList) Get(AIndex int) *TPDFSection {
-	return list.Sections[AIndex]
-}
-
-func (list *TPDFSectionList) Count() int {
-	return len(list.Sections)
-}
-func (list *TPDFSectionList) NewSection(title string) *TPDFSection {
-	list.Sections = append(list.Sections, &TPDFSection{Title: title})
+func NewTPDFSectionList() *SectionList         { return &SectionList{} }
+func (list *SectionList) Get(idx int) *Section { return list.Sections[idx] }
+func (list *SectionList) Count() int           { return len(list.Sections) }
+func (list *SectionList) NewSection(title string) *Section {
+	list.Sections = append(list.Sections, &Section{Title: title})
 	return list.Sections[list.Count()-1]
-}
-
-func NewTPDFSectionList() *TPDFSectionList {
-	return &TPDFSectionList{}
 }
 
 // type TPDFAnnot struct {
 // 	TPDFObject
-// 	FLeft, FBottom, FWidth, FHeight PDFFloat
+// 	FLeft, FBottom, FWidth, FHeight float64
 // 	FURI                            string
 // 	FBorder, FExternalLink          bool
 // }
 
-// func NewTPDFAnnotDetailed(ADocument *TPDFDocument, ALeft, ABottom, AWidth, AHeight PDFFloat, AURI string, ABorder, AExternalLink bool) *TPDFAnnot {
+// func NewTPDFAnnotDetailed(ADocument *TPDFDocument, ALeft, ABottom, AWidth, AHeight float64, AURI string, ABorder, AExternalLink bool) *TPDFAnnot {
 // 	return &TPDFAnnot{
 // 		TPDFObject:    NewTPDFObject(ADocument),
 // 		FLeft:         ALeft,

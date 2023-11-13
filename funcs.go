@@ -44,7 +44,7 @@ func FormatPDFInt(value, padLen int) string {
 	return result
 }
 
-func CompressStream(AFrom, ATo *bytes.Buffer, ACompressLevel TCompressionLevel, ASkipHeader bool) {
+func CompressStream(AFrom, ATo *bytes.Buffer, ACompressLevel CompressionLevel, ASkipHeader bool) {
 	if AFrom.Len() == 0 {
 		ATo.Reset()
 		return
@@ -69,36 +69,36 @@ func DecompressStream(AFrom, ATo *bytes.Buffer) {
 	}
 
 	reader, _ := zlib.NewReader(AFrom)
-	// FIXME	
+	// FIXME
 	// _, _ = reader.WriteTo(ATo)
 	_ = reader.Close()
 }
 
-func mmToPDF(mm PDFFloat) PDFFloat {
-	return PDFFloat(mm * (cDefaultDPI / cInchToMM))
+func mmToPDF(mm float64) float64 {
+	return float64(mm * (cDefaultDPI / cInchToMM))
 }
 
-func PDFTomm(APixels PDFFloat) PDFFloat {
-	return PDFFloat(APixels*cInchToMM) / cDefaultDPI
+func PDFTomm(APixels float64) float64 {
+	return float64(APixels*cInchToMM) / cDefaultDPI
 }
 
-func cmToPDF(cm PDFFloat) PDFFloat {
-	return PDFFloat(cm * (cDefaultDPI / cInchToCM))
+func cmToPDF(cm float64) float64 {
+	return float64(cm * (cDefaultDPI / cInchToCM))
 }
 
-func PDFtoCM(APixels PDFFloat) PDFFloat {
-	return PDFFloat(APixels*cInchToCM) / cDefaultDPI
+func PDFtoCM(APixels float64) float64 {
+	return float64(APixels*cInchToCM) / cDefaultDPI
 }
 
-func InchesToPDF(Inches PDFFloat) PDFFloat {
-	return PDFFloat(Inches * cDefaultDPI)
+func InchesToPDF(Inches float64) float64 {
+	return float64(Inches * cDefaultDPI)
 }
-func PDFtoInches(APixels PDFFloat) PDFFloat {
-	return PDFFloat(APixels) / cDefaultDPI
+func PDFtoInches(APixels float64) float64 {
+	return float64(APixels) / cDefaultDPI
 }
 
-// func FontUnitsTomm(AUnits, APointSize PDFFloat, AUnitsPerEm int) PDFFloat {
-// 	return PDFFloat(AUnits * APointSize * dpi / (72 * PDFFloat(AUnitsPerEm)) * cInchToMM / dpi)
+// func FontUnitsTomm(AUnits, APointSize float64, AUnitsPerEm int) float64 {
+// 	return float64(AUnits * APointSize * dpi / (72 * float64(AUnitsPerEm)) * cInchToMM / dpi)
 // }
 
 // func XMLEscape(data string) string {
@@ -135,8 +135,8 @@ func ExtractBaseFontName(AValue string) string {
 	return FontName + "-" + S1 + S2
 }
 
-func FloatStr(f PDFFloat) string {
-	if f == PDFFloat(int64(f)) { //is a whole number
+func FloatStr(f float64) string {
+	if f == float64(int64(f)) { //is a whole number
 		return strconv.FormatFloat(float64(f), 'f', 0, 32)
 	}
 	return strconv.FormatFloat(float64(f), 'f', 2, 32)
@@ -165,8 +165,8 @@ func octStr(b byte) string {
 	return result
 }
 
-func DoUnitConversion(APoint *TPDFCoord, UnitOfMeasure TPDFUnitOfMeasure) {
-	switch UnitOfMeasure {
+func DoUnitConversion(APoint *Coord, uofm UnitOfMeasure) {
+	switch uofm {
 	case uomMillimeters:
 		APoint.x = mmToPDF(APoint.x)
 		APoint.y = mmToPDF(APoint.y)
@@ -179,20 +179,27 @@ func DoUnitConversion(APoint *TPDFCoord, UnitOfMeasure TPDFUnitOfMeasure) {
 	}
 }
 
-// func DegToRad(a PDFFloat) PDFFloat {
-// 	return PDFFloat(a * _DegToRad)
+// func DegToRad(a float64) float64 {
+// 	return float64(a * _DegToRad)
 // }
 
-
-func DegToRad(a float32) float32 {
-	return float32(a * _DegToRad)
+func DegToRad(a float64) float64 {
+	return a * _DegToRad
 }
 
-func sincos(a float32) (sin,cost float64) {
-	return math.Sincos(float64(a))
+func sincos(a float64) (sin, cost float64) {
+	return math.Sincos(a)
 }
 
 func GetMD5Hash(text string) string {
-   hash := md5.Sum([]byte(text))
-   return hex.EncodeToString(hash[:])
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
 }
+
+func cond[T any](condition bool, iftrue, iffalse T) T {
+	if condition {
+		return iftrue
+	}
+	return iffalse
+}
+

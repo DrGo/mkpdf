@@ -164,7 +164,7 @@ _testmain.go
 vifm/vifminfo.json
 nvim/lazy-lock.json
 node_modules
-_old 
+old 
 
 /target
 /Cargo.lock

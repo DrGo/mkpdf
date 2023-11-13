@@ -219,7 +219,7 @@ package main
 // 	st.WriteString(PopGraphicsStackCommand())
 // }
 
-// func NewPDFImage(document *TPDFDocument, left, bottom, width, height PDFFloat, number int) *TPDFImage {
+// func NewPDFImage(document *TPDFDocument, left, bottom, width, height float64, number int) *TPDFImage {
 // 	return &TPDFImage{
 // 		TPDFDocumentObject: NewTPDFDocumentObject(document),
 // 		Number:           number,
@@ -227,6 +227,3 @@ package main
 // 		Size:             TPDFCoord{x: width, y: height},
 // 	}
 // }
-
-
-

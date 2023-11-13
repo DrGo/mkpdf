@@ -222,9 +222,8 @@ var (
 		760, 946, 771, 865, 771, 888, 967, 888, 831, 873, 927, 970, 918, 0}
 )
 
-
-func TextHeight(fontname string, pointSize int) (PDFFloat, error) {
-	var result int 
+func TextHeight(fontname string, pointSize int) (float64, error) {
+	var result int
 	switch fontname {
 	case "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique":
 		result = FONT_TIMES_COURIER_CAPHEIGHT
@@ -247,37 +246,36 @@ func TextHeight(fontname string, pointSize int) (PDFFloat, error) {
 	case "Symbol", "ZapfDingbats":
 		result = 300
 	default:
-		return 0,  fmt.Errorf(rsErrUnknownStdFont, fontname)
+		return 0, fmt.Errorf(rsErrUnknownStdFont, fontname)
 	}
-	return PDFFloat(result * pointSize/ 1540),nil 
+	return float64(result * pointSize / 1540), nil
 }
 
-func  GetStdFontCharWidthsArray(AFontName string) TPDFFontWidthArray {
-    switch AFontName {
-    case "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique":
-        return FONT_COURIER_FULL
-    case "Helvetica":
-        return FONT_HELVETICA_ARIAL
-    case "Helvetica-Bold":
-        return FONT_HELVETICA_ARIAL_BOLD
-    case "Helvetica-Oblique":
-        return FONT_HELVETICA_ARIAL_ITALIC
-    case "Helvetica-BoldOblique":
-        return FONT_HELVETICA_ARIAL_BOLD_ITALIC
-    case "Times-Roman":
-        return FONT_TIMES
-    case "Times-Bold":
-        return FONT_TIMES_BOLD
-    case "Times-Italic":
-        return FONT_TIMES_ITALIC
-    case "Times-BoldItalic":
-        return FONT_TIMES_BOLD_ITALIC
-    case "Symbol":
-        return FONT_SYMBOL
-    case "ZapfDingbats":
-        return FONT_ZAPFDINGBATS
-    default:
-        panic(fmt.Sprintf("Unknown standard font: %s", AFontName))
-    }
+func GetStdFontCharWidthsArray(AFontName string) FontWidthArray {
+	switch AFontName {
+	case "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique":
+		return FONT_COURIER_FULL
+	case "Helvetica":
+		return FONT_HELVETICA_ARIAL
+	case "Helvetica-Bold":
+		return FONT_HELVETICA_ARIAL_BOLD
+	case "Helvetica-Oblique":
+		return FONT_HELVETICA_ARIAL_ITALIC
+	case "Helvetica-BoldOblique":
+		return FONT_HELVETICA_ARIAL_BOLD_ITALIC
+	case "Times-Roman":
+		return FONT_TIMES
+	case "Times-Bold":
+		return FONT_TIMES_BOLD
+	case "Times-Italic":
+		return FONT_TIMES_ITALIC
+	case "Times-BoldItalic":
+		return FONT_TIMES_BOLD_ITALIC
+	case "Symbol":
+		return FONT_SYMBOL
+	case "ZapfDingbats":
+		return FONT_ZAPFDINGBATS
+	default:
+		panic(fmt.Sprintf("Unknown standard font: %s", AFontName))
+	}
 }
-

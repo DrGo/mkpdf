@@ -1,110 +1,101 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 )
 
-type TPDFEmbeddedFont struct {
-	TPDFDocumentObject
+type EmbeddedFont struct {
+	DocObj
 	TxtFont        int
-	TxtSize        PDFFloat
-	Page           *TPDFPage
+	TxtSize        float64
+	Page           *Page
 	SimulateBold   bool
 	SimulateItalic bool
 }
 
-func NewTPDFEmbeddedFont(ADocument *TPDFDocument, APage *TPDFPage, AFont int, ASize PDFFloat) *TPDFEmbeddedFont {
-	return &TPDFEmbeddedFont{
-		TxtFont: AFont,
-		TxtSize: ASize,
-		Page:    APage,
-	}
+func NewEmbeddedFont(doc *Document, page *Page, fontNum int, size float64) *EmbeddedFont {
+	return NewEmbeddedFontEx(doc, page, fontNum, size, false, false)
 }
 
-func NewTPDFEmbeddedFontAdvanced(ADocument *TPDFDocument, APage *TPDFPage, AFont int, ASize PDFFloat, ASimulateBold, ASimulateItalic bool) *TPDFEmbeddedFont {
-	return &TPDFEmbeddedFont{
-		TxtFont:        AFont,
-		TxtSize:        ASize,
-		Page:           APage,
+func NewEmbeddedFontEx(doc *Document, page *Page, fontNum int, size float64, ASimulateBold, ASimulateItalic bool) *EmbeddedFont {
+	return &EmbeddedFont{
+		TxtFont:        fontNum,
+		TxtSize:        size,
+		Page:           page,
 		SimulateBold:   ASimulateBold,
 		SimulateItalic: ASimulateItalic,
 	}
 }
 
-func (f *TPDFEmbeddedFont) PointSize() int {
+func (f *EmbeddedFont) PointSize() int {
 	return int(f.TxtSize)
 	// val, _ := strconv.ParseFloat(f.FTxtSize, 64)
 	// return int(math.Round(val))
 }
 
-func (f *TPDFEmbeddedFont) FontSize() PDFFloat {
+func (f *EmbeddedFont) FontSize() float64 {
 	return f.TxtSize
 	// val, _ := strconv.ParseFloat(f.FTxtSize, 64)
 	// return val
 }
 
 // WriteString('/F'+IntToStr(FTxtFont)+' '+FTxtSize+' Tf'+CRLF, AStream);
-func (f *TPDFEmbeddedFont) Encode(st PDFWriter) {
+func (f *EmbeddedFont) Encode(st PDFWriter) {
 	st.Writef("/F%d %f Tf%s", f.TxtFont, f.TxtSize, CRLF)
 }
 
-func (f *TPDFEmbeddedFont) WriteEmbeddedFont(ADocument *TPDFDocument, Src io.Reader, st PDFWriter) int {
+func (f *EmbeddedFont) WriteEmbeddedFont(doc *Document, src io.Reader, st PDFWriter) int {
 	st.Writef("%sstream%s", CRLF, CRLF)
 	PS := st.Offset()
 	if f.Document.hasOption(poCompressFonts) {
-		var CompressedStream bytes.Buffer
-		//FIXME: which CompressedStream to use
-		// CompressStream(Src, CompressedStream)
-		st.Write(CompressedStream.Bytes())
+		_ = compressStream(st, src)		
 	} else {
 		//FIXME: handle errors
-		buf, _ := io.ReadAll(Src)
-		st.Write(buf)
+		_, _ = io.Copy(st,  src)
 	}
-
 	st.WriteString(CRLF)
 	st.WriteString("endstream")
 	return st.Offset() - PS
 }
 
-// func (TPDFEmbeddedFont) WriteEmbeddedSubsetFont(ADocument *TPDFDocument, AFontNum int, AOutStream io.Writer) int64 {
-// 	if ADocument.Fonts[AFontNum].SubsetFont == nil {
+// func (TPDFEmbeddedFont) WriteEmbeddedSubsetFont(doc *TPDFDocument, AFontNum int, AOutStream io.Writer) int64 {
+// 	if doc.Fonts[AFontNum].SubsetFont == nil {
 // 		panic("WriteEmbeddedSubsetFont: SubsetFont stream was not initialised.")
 // 	}
 // 	fmt.Fprintf(AOutStream, "%sstream%s", CRLF, CRLF)
 // 	PS := int64(AOutStream.(io.Seeker).Seek(0, io.SeekCurrent))
-// 	if ADocument.Options.Contains(poCompressFonts) {
+// 	if doc.Options.Contains(poCompressFonts) {
 // 		CompressedStream := new(bytes.Buffer)
-// 		CompressStream(ADocument.Fonts[AFontNum].SubsetFont, CompressedStream)
+// 		CompressStream(doc.Fonts[AFontNum].SubsetFont, CompressedStream)
 // 		CompressedStream.WriteTo(AOutStream)
 // 	} else {
-// 		io.Copy(AOutStream, ADocument.Fonts[AFontNum].SubsetFont)
+// 		io.Copy(AOutStream, doc.Fonts[AFontNum].SubsetFont)
 // 	}
 // 	return int64(AOutStream.(io.Seeker).Seek(0, io.SeekCurrent)) - PS
 // }
 
-type TPDFFont struct {
-	FIsStdFont       bool
-	FName            string
-	FFontFilename    string
+type Font struct {
+	IsStdFont    bool
+	Name         string
+	FontFilename string
 	// FTrueTypeFile    TTFFileInfo
-	FTextMappingList TTextMappingList
-	FSubsetFont      io.Reader
+	TextMappingList TTextMappingList
+	SubsetFont      io.Reader
 }
 
-func (f *TPDFFont) SetFontFilename(filename string) {
-	if f.FFontFilename == filename {
+func NewFont(name   string, isStd bool) *Font { return &Font{Name: name, IsStdFont: isStd } }
+func (f *Font) SetFontFilename(filename string) {
+	if f.FontFilename == filename {
 		return
 	}
-	f.FFontFilename = filename
+	f.FontFilename = filename
 	f.PrepareTextMapping()
 }
 
-func (f *TPDFFont) PrepareTextMapping() {
-	if f.FFontFilename != "" {
-		f.FTextMappingList = TTextMappingList{}
+func (f *Font) PrepareTextMapping() {
+	if f.FontFilename != "" {
+		f.TextMappingList = TTextMappingList{}
 		// f.FTrueTypeFile = &TTFFileInfo{}
 		// f.FTrueTypeFile.LoadFromFile(f.FFontFilename)
 		// f.FTrueTypeFile.PrepareFontDefinition("cp1252", true)
@@ -127,19 +118,15 @@ func (f *TPDFFont) PrepareTextMapping() {
 // 	fs.Close()
 // }
 
-func NewTPDFFont() *TPDFFont {
-	return &TPDFFont{
-	}
-}
-func (f *TPDFFont) GetGlyphIndices(AText string) string {
+func (f *Font) GetGlyphIndices(txt string) string {
 	result := ""
-	if len(AText) == 0 {
+	if len(txt) == 0 {
 		return result
 	}
-	for _, char := range AText {
+	for _, char := range txt {
 		c := uint16(char)
 		matched := false
-		for _, mapping := range f.FTextMappingList{
+		for _, mapping := range f.TextMappingList {
 			if mapping.CharID == c {
 				result += fmt.Sprintf("%04X", mapping.GlyphID)
 				c = 0
@@ -154,8 +141,8 @@ func (f *TPDFFont) GetGlyphIndices(AText string) string {
 	return result
 }
 
-func (f *TPDFFont) AddTextToMappingList(AText string) {
-	// for _, char := range AText {
+func (f *Font) AddTextToMappingList(txt string) {
+	// for _, char := range txt {
 	// 	c := uint16(char)
 	// 	gid := f.FTrueTypeFile.GetGlyphIndex(c)
 	// 	f.FTextMappingList=append(f.FTextMappingList, )
@@ -163,12 +150,12 @@ func (f *TPDFFont) AddTextToMappingList(AText string) {
 	// }
 }
 
-type TPDFTrueTypeCharWidths struct {
-	Document        *TPDFDocument
+type TrueTypeCharWidths struct {
+	Document        *Document
 	EmbeddedFontNum int
 }
 
-func (w *TPDFTrueTypeCharWidths) Encode(st PDFWriter) {
+func (w *TrueTypeCharWidths) Encode(st PDFWriter) {
 	// var s string
 	// lst := w.Document.Fonts[w.EmbeddedFontNum].TextMapping
 	// lst.Sort()
@@ -187,8 +174,8 @@ func (w *TPDFTrueTypeCharWidths) Encode(st PDFWriter) {
 	// st.Write([]byte(s))
 }
 
-func IsStandardPDFFont(AFontName string) bool {
-	switch AFontName {
+func IsStandardFont(fontname string) bool {
+	switch fontname {
 	case "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique",
 		"Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Helvetica-BoldOblique",
 		"Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic",

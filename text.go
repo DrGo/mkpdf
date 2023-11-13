@@ -5,40 +5,36 @@ import (
 	"strings"
 )
 
-type TPDFAbstractString struct {
-	TPDFDocumentObject
+type AbsString struct {
+	DocObj
 	FontIndex int
 }
 
-func NewAbstractString(document *TPDFDocument) TPDFAbstractString {
-	return TPDFAbstractString{NewTPDFDocumentObject(document), 0}
+func NewAbstractString(document *Document) AbsString {
+	return AbsString{NewDocObj(document), 0}
 }
+
+var pdfStringReplacer = strings.NewReplacer("\\", "\\\\", "(", "\\(", ")", "\\)")
 
 // These symbols must be preceded by a backslash:  "(", ")", "\"
-func (a *TPDFAbstractString) InsertEscape(AValue string) string {
-	S := AValue
-	S = strings.ReplaceAll(S, "\\", "\\\\")
-	S = strings.ReplaceAll(S, "(", "\\(")
-	S = strings.ReplaceAll(S, ")", "\\)")
-	return S
+func escapePDFString(val string) string {
+	return pdfStringReplacer.Replace(val)
 }
 
-type TPDFString struct {
-	TPDFAbstractString
+type String struct {
+	AbsString
 	Value   string
 	CPValue string
 }
 
-func NewTPDFString(ADocument *TPDFDocument, AValue string) *TPDFString {
-	str := TPDFString{}
-	str.Document = ADocument
-	str.Value = AValue
-	if strings.ContainsAny(AValue, "()\\") {
-		str.Value = str.InsertEscape(AValue)
+func NewString(doc *Document, val string) *String {
+	if strings.ContainsAny(val, "()\\") {
+		val = escapePDFString(val)
 	}
-	return &str
+	return &String{NewAbstractString(doc), val, ""}
 }
-func (s *TPDFString) GetCPValue() string {
+
+func (s *String) GetCPValue() string {
 	if s.CPValue == "" {
 		s.CPValue = s.Value
 		//FIXME:
@@ -47,23 +43,21 @@ func (s *TPDFString) GetCPValue() string {
 	return s.CPValue
 }
 
-func (s *TPDFString) Encode(st PDFWriter) {
-	st.WriteString("(")
-	st.WriteString(s.GetCPValue())
-	st.WriteString(")")
+func (s *String) Encode(st PDFWriter) {
+	st.WriteString("(" + s.GetCPValue()+ ")")
 }
 
-type TPDFRawHexString struct {
-	TPDFDocumentObject
+type RawHexString struct {
+	DocObj
 	Value string
 }
 
-func (hs *TPDFRawHexString) Encode(st PDFWriter) {
+func (hs *RawHexString) Encode(st PDFWriter) {
 	st.Writef("<%s>", hs.Value)
 }
 
-func NewTPDFRawHexString(aDocument *TPDFDocument, aValue string) *TPDFRawHexString {
-	return &TPDFRawHexString{NewTPDFDocumentObject(aDocument), aValue}
+func NewRawHexString(doc *Document, val string) *RawHexString {
+	return &RawHexString{NewDocObj(doc), val}
 }
 
 //type TPDFUTF8String struct {
@@ -71,27 +65,27 @@ func NewTPDFRawHexString(aDocument *TPDFDocument, aValue string) *TPDFRawHexStri
 //	Value string
 //}
 
-type TPDFFreeFormString struct {
-	TPDFAbstractString
+type FreeFormString struct {
+	AbsString
 	Value string
 }
 
-
-func (f *TPDFFreeFormString) Encode(st PDFWriter) {
+func (f *FreeFormString) Encode(st PDFWriter) {
 	st.WriteString(f.Value)
 }
 
-func NewTPDFFreeFormString(ADocument *TPDFDocument, AValue string) *TPDFFreeFormString {
-	return &TPDFFreeFormString{NewAbstractString(ADocument),	AValue }
+func NewFreeFormString(doc *Document, val string) *FreeFormString {
+	return &FreeFormString{NewAbstractString(doc), val}
 }
+
 //type TPDFUTF16String struct {
 //	TPDFAbstractString
 //	Value string
 //}
-//func NewTPDFUTF16String(ADocument *TPDFDocument, AValue string, AFontIndex int) TPDFUTF16String {
+//func NewTPDFUTF16String(doc *TPDFDocument, val string, AFontIndex int) TPDFUTF16String {
 //	utf16str := TPDFUTF16String{}
-//	utf16str.FDocument = ADocument
-//	utf16str.Value = AValue
+//	utf16str.FDocument = doc
+//	utf16str.Value = val
 //	utf16str.FontIndex = AFontIndex
 //	return utf16str
 //}
@@ -160,65 +154,63 @@ func NewTPDFFreeFormString(ADocument *TPDFDocument, AValue string) *TPDFFreeForm
 //	st.WriteString(">")
 //}
 
-//func NewTPDFUTF8String(ADocument *TPDFDocument, AValue string, AFontIndex int) TPDFUTF8String {
-//	utf8str := TPDFUTF8String{}
-//	utf8str.FDocument = ADocument
-//	utf8str.Value = AValue
-//	utf8str.FontIndex = AFontIndex
-//	return utf8str
-//}
-type TPDFBaseText struct {
-	TPDFDocumentObject
-	X, Y          PDFFloat
-	Font          *TPDFEmbeddedFont
-	Degrees       PDFFloat
+//	func NewTPDFUTF8String(doc *TPDFDocument, val string, AFontIndex int) TPDFUTF8String {
+//		utf8str := TPDFUTF8String{}
+//		utf8str.FDocument = doc
+//		utf8str.Value = val
+//		utf8str.FontIndex = AFontIndex
+//		return utf8str
+//	}
+type BaseText struct {
+	DocObj
+	X, Y          float64
+	Font          *EmbeddedFont
+	Degrees       float64
 	Underline     bool
-	Color        ARGBColor 
+	Color         ARGBColor
 	StrikeThrough bool
 }
 
-func NewTPDFBaseText(document *TPDFDocument) *TPDFBaseText {
-	return &TPDFBaseText{
-		TPDFDocumentObject: NewTPDFDocumentObject(document),
-		X:                  0.0,
-		Y:                  0.0,
-		Font:               nil,
-		Degrees:            0.0,
-		Underline:          false,
-		Color:              clBlack,
-		StrikeThrough:      false,
+func NewBaseText(document *Document) *BaseText {
+	return &BaseText{
+		DocObj:        NewDocObj(document),
+		X:             0.0,
+		Y:             0.0,
+		Font:          nil,
+		Degrees:       0.0,
+		Underline:     false,
+		Color:         clBlack,
+		StrikeThrough: false,
 	}
 }
 
-type TPDFText struct {
-	TPDFBaseText
-	str *TPDFString
+type Text struct {
+	BaseText
+	str *String
 }
 
-
-func NewTPDFText(document *TPDFDocument, x,y PDFFloat, txt string, font *TPDFEmbeddedFont, 
-	degrees float32, underline, strikeThrough bool) *TPDFText {
-		t:=  &TPDFText{  
-		TPDFBaseText{
-		TPDFDocumentObject: NewTPDFDocumentObject(document),
-		X: x,
-		Y:y, 
-		Font: font,
-		Degrees: PDFFloat(degrees),
-		Underline: underline,
-		StrikeThrough: strikeThrough,
-	}, 
-	NewTPDFString(document, txt),}
+func NewText(document *Document, x, y float64, txt string, font *EmbeddedFont,
+	degrees float64, underline, strikeThrough bool) *Text {
+	t := &Text{
+		BaseText{
+			DocObj:        NewDocObj(document),
+			X:             x,
+			Y:             y,
+			Font:          font,
+			Degrees:       float64(degrees),
+			Underline:     underline,
+			StrikeThrough: strikeThrough,
+		},
+		NewString(document, txt)}
 	if t.Font != nil && t.Font.Page != nil {
 		t.Color = t.Font.Page.LastFontColor
 	}
-	return t 
-}	
+	return t
+}
 
-
-func (t *TPDFText) GetTextWidth() PDFFloat {
-	lFontName := t.Document.Fonts[t.str.FontIndex].FName
-	if !IsStandardPDFFont(lFontName) {
+func (t *Text) GetTextWidth() float64 {
+	lFontName := t.Document.Fonts[t.str.FontIndex].Name
+	if !IsStandardFont(lFontName) {
 		panic(fmt.Sprintf(rsErrUnknownStdFont, lFontName))
 	}
 
@@ -227,38 +219,154 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 	for i := 0; i < len(CPV); i++ {
 		lWidth += GetStdFontCharWidthsArray(lFontName)[CPV[i]]
 	}
-	return PDFFloat(lWidth * t.Font.PointSize() / 1540)
+	return float64(lWidth * t.Font.PointSize() / 1540)
 }
 
-// func (t *TPDFText) GetTextHeight() PDFFloat {
-// 	lFontName := t.Document.Fonts[t.str.FontIndex].FName
-// 	var result PDFFloat
-// 	switch lFontName {
-// 	case "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique":
-// 		result = FONT_TIMES_COURIER_CAPHEIGHT
-// 	case "Helvetica":
-// 		result = FONT_HELVETICA_ARIAL_CAPHEIGHT
-// 	case "Helvetica-Bold":
-// 		result = FONT_HELVETICA_ARIAL_BOLD_CAPHEIGHT
-// 	case "Helvetica-Oblique":
-// 		result = FONT_HELVETICA_ARIAL_ITALIC_CAPHEIGHT
-// 	case "Helvetica-BoldOblique":
-// 		result = FONT_HELVETICA_ARIAL_BOLD_ITALIC_CAPHEIGHT
-// 	case "Times-Roman":
-// 		result = FONT_TIMES_CAPHEIGHT
-// 	case "Times-Bold":
-// 		result = FONT_TIMES_BOLD_CAPHEIGHT
-// 	case "Times-Italic":
-// 		result = FONT_TIMES_ITALIC_CAPHEIGHT
-// 	case "Times-BoldItalic":
-// 		result = FONT_TIMES_BOLD_ITALIC_CAPHEIGHT
-// 	case "Symbol", "ZapfDingbats":
-// 		result = 300
-// 	default:
-// 		panic(fmt.Sprintf(rsErrUnknownStdFont, lFontName))
-// 	}
-// 	return result * t.Font.PointSize / 1540
-// }
+func (t *Text) GetTextHeight() float64 {
+	lFontName := t.Document.Fonts[t.str.FontIndex].Name
+	var result int
+	switch lFontName {
+	case "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique":
+		result = FONT_TIMES_COURIER_CAPHEIGHT
+	case "Helvetica":
+		result = FONT_HELVETICA_ARIAL_CAPHEIGHT
+	case "Helvetica-Bold":
+		result = FONT_HELVETICA_ARIAL_BOLD_CAPHEIGHT
+	case "Helvetica-Oblique":
+		result = FONT_HELVETICA_ARIAL_ITALIC_CAPHEIGHT
+	case "Helvetica-BoldOblique":
+		result = FONT_HELVETICA_ARIAL_BOLD_ITALIC_CAPHEIGHT
+	case "Times-Roman":
+		result = FONT_TIMES_CAPHEIGHT
+	case "Times-Bold":
+		result = FONT_TIMES_BOLD_CAPHEIGHT
+	case "Times-Italic":
+		result = FONT_TIMES_ITALIC_CAPHEIGHT
+	case "Times-BoldItalic":
+		result = FONT_TIMES_BOLD_ITALIC_CAPHEIGHT
+	case "Symbol", "ZapfDingbats":
+		result = 300
+	default:
+		panic(fmt.Sprintf(rsErrUnknownStdFont, lFontName))
+	}
+	return float64(result * t.Font.PointSize() / 1540)
+}
+
+func (t *Text) Encode(st PDFWriter) {
+	var rad, radc, rads float64
+	calcAngle := func(degrees float64) {
+		rad = DegToRad(-degrees)
+		rads, radc = sincos(rad)
+	}
+	st.WriteString("BT" + CRLF)
+	if t.Degrees != 0.0 {
+		calcAngle(t.Degrees)
+		st.Writef("%.4f %.4f %.4f %.4f %.4f %.4f Tm%s", radc, -rads, rads, radc, t.X, t.Y, CRLF)
+	} else {
+		st.WriteString(fmt.Sprintf("%f %f TD%s", t.X, t.Y, CRLF))
+	}
+
+	t.str.Encode(st)
+	st.WriteString(" Tj" + CRLF)
+	st.WriteString("ET" + CRLF)
+
+	if !t.Underline && !t.StrikeThrough {
+		return
+	}
+	// lWidth := t.GetTextWidth()
+	// lHeight := t.GetTextHeight()
+	// //    convert the Font Units to Millimeters. This is also because fontcache DPI (default 96) could differ from PDF DPI (72).
+	// lTextWidthInMM := (lWidth * cInchToMM) / gTTFontCache.DPI
+	// lTextHeightInMM := (lHeight * cInchToMM) / gTTFontCache.DPI
+
+	// //   if Degrees <> 0.0 then
+	// //     // angled text
+	// //     WriteString(Format('q %s %s %s %s %s %s cm', [t1, t2, t3, t1, FloatStr(X), FloatStr(Y)]) + CRLF, AStream)
+	// //   else
+	// //     // horizontal text
+	// //     WriteString(Format('q 1 0 0 1 %s %s cm', [FloatStr(X), FloatStr(Y)]) + CRLF, AStream);
+
+	// //   { set up a pen width and stroke color }
+	// //   lColor := TPDFColor.Command(True, Color);
+	// //   lLineWidth := FloatStr(mmToPDF(lTextHeightInMM / 12)) + ' w ';
+	// //   WriteString(lLineWidth + lColor + CRLF, AStream);
+
+	// //   { line segment is relative to matrix translation coordinate, set above }
+	// //   if Underline then
+	// //     WriteString(Format('0 -1.5 m %s -1.5 l S', [FloatStr(mmToPDF(lTextWidthInMM))]) + CRLF, AStream);
+	// //   if StrikeThrough then
+	// //     WriteString(Format('0 %s m %s %0:s l S', [FloatStr(mmToPDF(lTextHeightInMM) / 2), FloatStr(mmToPDF(lTextWidthInMM))]) + CRLF, AStream);
+
+	// //   { restore graphics state to before the translation matrix adjustment }
+	// //   WriteString('Q' + CRLF, AStream);
+
+	// if t.Degrees != 0.0 {
+	// 	st.WriteString(fmt.Sprintf("%f %f %f %f %f %f cm%s", a1, b1, c1, d1, t.X, t.Y, CRLF))
+	// } else {
+	// 	st.WriteString(fmt.Sprintf("1 0 0 1 %f %f cm%s", t.X, t.Y, CRLF))
+	// }
+
+	// fontData := lFC.FontData
+
+	// if t.Underline {
+	// 	lUnderlinePos := PDFTomm(-1.5)
+	// 	lUnderlineSize := lTextHeightInMM / 12
+	// 	if fontData.PostScript.UnderlinePosition != 0 {
+	// 		lUnderlinePos = FontUnitsTomm(fontData.PostScript.UnderlinePosition, t.Font.PointSize, fontData.Head.UnitsPerEm)
+	// 	}
+	// 	if fontData.PostScript.underlineThickness != 0 {
+	// 		lUnderlineSize = FontUnitsTomm(fontData.PostScript.underlineThickness, t.Font.PointSize, fontData.Head.UnitsPerEm)
+	// 	}
+
+	// 	lLineWidth := FloatStr(mmToPDF(lUnderlineSize)) + " w "
+	// 	st.WriteString(lLineWidth + lColor + CRLF)
+	// 	st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lUnderlinePos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
+	// }
+	// if t.StrikeThrough {
+	// 	lStrikeOutPos := lTextHeightInMM / 2
+	// 	lStrikeOutSize := lTextHeightInMM / 12
+	// 	if fontData.OS2Data.yStrikeoutPosition != 0 {
+	// 		lStrikeOutPos = FontUnitsTomm(fontData.OS2Data.yStrikeoutPosition, t.Font.PointSize, fontData.Head.UnitsPerEm)
+	// 	}
+	// 	if fontData.OS2Data.yStrikeoutSize != 0 {
+	// 		lStrikeOutSize = FontUnitsTomm(fontData.OS2Data.yStrikeoutSize, t.Font.PointSize, fontData.Head.UnitsPerEm)
+	// 	}
+
+	// 	lLineWidth := FloatStr(mmToPDF(lStrikeOutSize)) + " w "
+	// 	st.WriteString(lLineWidth + lColor + CRLF)
+	// 	st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lStrikeOutPos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
+	// }
+}
+
+// procedure TPDFText.Write(const AStream: TStream);
+//   // result is in Font Units
+//   lWidth := GetTextWidth;
+//   lHeight := GetTextHeight;
+//   { convert the Font Units to Millimeters. This is also because fontcache DPI (default 96) could differ from PDF DPI (72). }
+//   lTextWidthInMM := (lWidth * cInchToMM) / gTTFontCache.DPI;
+//   lTextHeightInMM := (lHeight * cInchToMM) / gTTFontCache.DPI;
+
+//   if Degrees <> 0.0 then
+//     // angled text
+//     WriteString(Format('q %s %s %s %s %s %s cm', [t1, t2, t3, t1, FloatStr(X), FloatStr(Y)]) + CRLF, AStream)
+//   else
+//     // horizontal text
+//     WriteString(Format('q 1 0 0 1 %s %s cm', [FloatStr(X), FloatStr(Y)]) + CRLF, AStream);
+
+//   { set up a pen width and stroke color }
+//   lColor := TPDFColor.Command(True, Color);
+//   lLineWidth := FloatStr(mmToPDF(lTextHeightInMM / 12)) + ' w ';
+//   WriteString(lLineWidth + lColor + CRLF, AStream);
+
+//   { line segment is relative to matrix translation coordinate, set above }
+//   if Underline then
+//     WriteString(Format('0 -1.5 m %s -1.5 l S', [FloatStr(mmToPDF(lTextWidthInMM))]) + CRLF, AStream);
+//   if StrikeThrough then
+//     WriteString(Format('0 %s m %s %0:s l S', [FloatStr(mmToPDF(lTextHeightInMM) / 2), FloatStr(mmToPDF(lTextWidthInMM))]) + CRLF, AStream);
+
+//   { restore graphics state to before the translation matrix adjustment }
+//   WriteString('Q' + CRLF, AStream);
+// end;
 
 // type TPDFUTF8Text struct {
 // 	PDFBaseText
@@ -271,16 +379,16 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // }
 
 // type TPDFUTF8Text struct {
-// 	X, Y, Degrees PDFFloat
+// 	X, Y, Degrees float64
 // 	Font          *TPDFEmbeddedFont
 // 	Underline     bool
 // 	StrikeThrough bool
 // }
 
 // func (t *TPDFUTF8Text) Write(st *TStream) {
-// 	t.st.WriteString("q"+CRLF)
+// 	st.WriteString("q"+CRLF)
 
-// 	t.st.WriteString("BT"+CRLF)
+// 	st.WriteString("BT"+CRLF)
 
 // 	a1, b1, c1, d1 := 1.0, 0.0, 0.0, 1.0
 // 	if t.Degrees != 0.0 {
@@ -290,7 +398,7 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // 		c1 = math.Sin(rad)
 // 		d1 = a1
 // 	} else {
-// 		t.st.WriteString(fmt.Sprintf("%f %f TD%s", t.X, t.Y, CRLF))
+// 		st.WriteString(fmt.Sprintf("%f %f TD%s", t.X, t.Y, CRLF))
 // 	}
 
 // 	lFC := gTTFontCache.Find(t.FDocument.Fonts[t.Font.FontIndex].Name)
@@ -299,8 +407,8 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 
 // 	if lFC != nil {
 // 		if t.Font.SimulateBold && !lFC.IsBold {
-// 			t.st.WriteString(lColor+CRLF)
-// 			t.st.WriteString(fmt.Sprintf("2 Tr %s w", FloatStr(t.Font.PointSize/30))+CRLF)
+// 			st.WriteString(lColor+CRLF)
+// 			st.WriteString(fmt.Sprintf("2 Tr %s w", FloatStr(t.Font.PointSize/30))+CRLF)
 // 		}
 // 		if t.Font.SimulateItalic && !lFC.IsItalic {
 // 			a2, b2 := 1.0, 0.0
@@ -310,12 +418,12 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // 		}
 // 	}
 // 	if t.Degrees != 0.0 || (t.Font.SimulateItalic && !lFC.IsItalic) {
-// 		t.st.WriteString(fmt.Sprintf("%f %f %f %f %f %f Tm%s", a1, b1, c1, d1, t.X, t.Y, CRLF))
+// 		st.WriteString(fmt.Sprintf("%f %f %f %f %f %f Tm%s", a1, b1, c1, d1, t.X, t.Y, CRLF))
 // 	}
 
 // 	t.FString.Write(st)
-// 	t.st.WriteString(" Tj"+CRLF)
-// 	t.st.WriteString("ET"+CRLF)
+// 	st.WriteString(" Tj"+CRLF)
+// 	st.WriteString("ET"+CRLF)
 
 // 	if !t.Underline && !t.StrikeThrough {
 // 		return
@@ -331,9 +439,9 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // 	lTextHeightInMM := (lHeight * cInchToMM) / gTTFontCache.DPI
 
 // 	if t.Degrees != 0.0 {
-// 		t.st.WriteString(fmt.Sprintf("%f %f %f %f %f %f cm%s", a1, b1, c1, d1, t.X, t.Y, CRLF))
+// 		st.WriteString(fmt.Sprintf("%f %f %f %f %f %f cm%s", a1, b1, c1, d1, t.X, t.Y, CRLF))
 // 	} else {
-// 		t.st.WriteString(fmt.Sprintf("1 0 0 1 %f %f cm%s", t.X, t.Y, CRLF))
+// 		st.WriteString(fmt.Sprintf("1 0 0 1 %f %f cm%s", t.X, t.Y, CRLF))
 // 	}
 
 // 	fontData := lFC.FontData
@@ -349,8 +457,8 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // 		}
 
 // 		lLineWidth := FloatStr(mmToPDF(lUnderlineSize)) + " w "
-// 		t.st.WriteString(lLineWidth+lColor+CRLF)
-// 		t.st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lUnderlinePos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
+// 		st.WriteString(lLineWidth+lColor+CRLF)
+// 		st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lUnderlinePos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
 // 	}
 // 	if t.StrikeThrough {
 // 		lStrikeOutPos := lTextHeightInMM / 2
@@ -363,12 +471,12 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // 		}
 
 // 		lLineWidth := FloatStr(mmToPDF(lStrikeOutSize)) + " w "
-// 		t.st.WriteString(lLineWidth+lColor+CRLF)
-// 		t.st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lStrikeOutPos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
+// 		st.WriteString(lLineWidth+lColor+CRLF)
+// 		st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lStrikeOutPos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
 // 	}
 // }
 
-// func NewTPDFUTF8Text(ADocument *TPDFDocument, AX, AY PDFFloat, AText string, AFont *TPDFEmbeddedFont, ADegrees TPDFFloat, AUnderline, AStrikeThrough bool) *TPDFUTF8Text {
+// func NewTPDFUTF8Text(doc *TPDFDocument, AX, AY float64, AText string, AFont *TPDFEmbeddedFont, ADegrees Tfloat64, AUnderline, AStrikeThrough bool) *TPDFUTF8Text {
 // 	t := &TPDFUTF8Text{
 // 		X:             AX,
 // 		Y:             AY,
@@ -376,7 +484,7 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // 		Degrees:       ADegrees,
 // 		Underline:     AUnderline,
 // 		StrikeThrough: AStrikeThrough,
-// 		FString:       ADocument.CreateUTF8String(AText, AFont.FontIndex),
+// 		FString:       doc.CreateUTF8String(AText, AFont.FontIndex),
 // 	}
 // 	if AFont != nil && AFont.Page != nil {
 // 		t.Color = AFont.Page.FLastFontColor
@@ -389,7 +497,7 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // }
 
 // type TPDFUTF16Text struct {
-// 	X, Y, Degrees            PDFFloat
+// 	X, Y, Degrees            float64
 // 	Font                     *TPDFEmbeddedFont
 // 	Underline, StrikeThrough bool
 // 	Color                    string
@@ -397,8 +505,8 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 
 // func (txt *TPDFUTF16Text) Write(st *TStream) {
 
-// 	txt.st.WriteString("q"+CRLF)
-// 	defer txt.st.WriteString("Q"+CRLF)
+// 	txst.WriteString("q"+CRLF)
+// 	defer txst.WriteString("Q"+CRLF)
 
 // 	txt.st.WriteString("BT"+CRLF)
 
@@ -484,7 +592,7 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 // 	}
 // }
 
-//	func NewTPDFUTF16Text(ADocument *TPDFDocument, AX, AY PDFFloat, AText string, AFont *TPDFEmbeddedFont, ADegrees TPDFFloat, AUnderline, AStrikeThrough bool) *TPDFUTF16Text {
+//	func NewTPDFUTF16Text(doc *TPDFDocument, AX, AY float64, AText string, AFont *TPDFEmbeddedFont, ADegrees Tfloat64, AUnderline, AStrikeThrough bool) *TPDFUTF16Text {
 //		txt := &TPDFUTF16Text{
 //			X:             AX,
 //			Y:             AY,
@@ -492,7 +600,7 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 //			Degrees:       ADegrees,
 //			Underline:     AUnderline,
 //			StrikeThrough: AStrikeThrough,
-//			FString:       ADocument.CreateUTF16String(AText, AFont.FontIndex),
+//			FString:       doc.CreateUTF16String(AText, AFont.FontIndex),
 //		}
 //		if AFont != nil && AFont.Page != nil {
 //			txt.Color = AFont.Page.FLastFontColor
@@ -500,38 +608,37 @@ func (t *TPDFText) GetTextWidth() PDFFloat {
 //		return txt
 //	}
 
-
 type TTextMapping struct {
 	CharID, GlyphID uint16
 }
 type TTextMappingList []TTextMapping
 
-func NewTPDFTrueTypeCharWidths(ADocument *TPDFDocument, AEmbeddedFontNum int) *TPDFTrueTypeCharWidths {
-	return &TPDFTrueTypeCharWidths{
-		Document:        ADocument,
+func NewTPDFTrueTypeCharWidths(doc *Document, AEmbeddedFontNum int) *TrueTypeCharWidths {
+	return &TrueTypeCharWidths{
+		Document:        doc,
 		EmbeddedFontNum: AEmbeddedFontNum,
 	}
 }
 
 // type PDFMiterLimit struct {
 // 	PDFGraphicObject
-// 	MiterLimit PDFFloat
+// 	MiterLimit float64
 // }
 
 // func (ml *PDFMiterLimit) Write(st TStream) {
 // 	st.WriteString(fmt.Sprintf("%f M%s", ml.MiterLimit, CRLF), stream)
 // }
 
-// func NewPDFMiterLimit(document *TPDFDocument, miterLimit PDFFloat) *PDFMiterLimit {
+// func NewPDFMiterLimit(document *TPDFDocument, miterLimit float64) *PDFMiterLimit {
 // 	return &PDFMiterLimit{
 // 		PDFGraphicObject: NewPDFGraphicObject(document),
 // 		MiterLimit:       miterLimit,
 // 	}
 // }
 
-// func NewTPDFFontNumBaseObject(aDocument *TPDFDocument, aFontNum int) *TPDFFontNumBaseObject {
+// func NewTPDFFontNumBaseObject(doc *TPDFDocument, aFontNum int) *TPDFFontNumBaseObject {
 // 	return &TPDFFontNumBaseObject{
-// 		TPDFObject: *NewTPDFObject(aDocument),
+// 		TPDFObject: *NewTPDFObject(doc),
 // 		FFontNum:   aFontNum,
 // 	}
 // }
@@ -618,8 +725,8 @@ func NewTPDFTrueTypeCharWidths(ADocument *TPDFDocument, AEmbeddedFontNum int) *T
 // 	FFontNum int
 // }
 
-// func NewTPDFFontNumBaseObject(ADocument *TPDFDocument, AFontNum int) *TPDFFontNumBaseObject {
-// 	return &TPDFFontNumBaseObject{TPDFDocumentObject: NewTPDFDocumentObject(ADocument), FFontNum: AFontNum}
+// func NewTPDFFontNumBaseObject(doc *TPDFDocument, AFontNum int) *TPDFFontNumBaseObject {
+// 	return &TPDFFontNumBaseObject{TPDFDocumentObject: NewTPDFDocumentObject(doc), FFontNum: AFontNum}
 // }
 
 // type TPDFToUnicode struct {
@@ -633,4 +740,3 @@ func NewTPDFTrueTypeCharWidths(ADocument *TPDFDocument, AEmbeddedFontNum int) *T
 // type TPDFCIDSet struct {
 // 	TPDFFontNumBaseObject
 // }
-

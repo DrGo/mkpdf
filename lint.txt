@@ -1,0 +1,1394 @@
+old/c/pdfgen.go:1: : C source files not allowed when not using cgo or SWIG: main.c pdfgen.c rgb.c (typecheck)
+package main
+old/c/pdfgen.go:127:1: expected declaration, found 'package' (typecheck)
+package main
+^
+old/c/pdfgen.go:129:1: imports must appear before other declarations (typecheck)
+import (
+^
+color.go:17:6: `ARGBGetAlpha` is unused (deadcode)
+func ARGBGetAlpha(color ARGBColor) byte {
+     ^
+color.go:42:6: `ColorCommand` is unused (deadcode)
+func ColorCommand(stroke bool, color ARGBColor) string {
+     ^
+consts.go:6:2: `clWhite` is unused (deadcode)
+	clWhite     = 0xFFFFFF
+	^
+consts.go:7:2: `clBlue` is unused (deadcode)
+	clBlue      = 0x0000FF
+	^
+consts.go:8:2: `clGreen` is unused (deadcode)
+	clGreen     = 0x008000
+	^
+consts.go:9:2: `clRed` is unused (deadcode)
+	clRed       = 0xFF0000
+	^
+consts.go:10:2: `clAqua` is unused (deadcode)
+	clAqua      = 0x00FFFF
+	^
+consts.go:11:2: `clMagenta` is unused (deadcode)
+	clMagenta   = 0xFF00FF
+	^
+consts.go:12:2: `clYellow` is unused (deadcode)
+	clYellow    = 0xFFFF00
+	^
+consts.go:13:2: `clLtGray` is unused (deadcode)
+	clLtGray    = 0xC0C0C0
+	^
+consts.go:14:2: `clMaroon` is unused (deadcode)
+	clMaroon    = 0x800000
+	^
+consts.go:15:2: `clOlive` is unused (deadcode)
+	clOlive     = 0x808000
+	^
+consts.go:16:2: `clDkGray` is unused (deadcode)
+	clDkGray    = 0x808080
+	^
+consts.go:17:2: `clTeal` is unused (deadcode)
+	clTeal      = 0x008080
+	^
+consts.go:18:2: `clNavy` is unused (deadcode)
+	clNavy      = 0x000080
+	^
+consts.go:19:2: `clPurple` is unused (deadcode)
+	clPurple    = 0x800080
+	^
+consts.go:20:2: `clLime` is unused (deadcode)
+	clLime      = 0x00FF00
+	^
+consts.go:21:2: `clWaterMark` is unused (deadcode)
+	clWaterMark = 0xF0F0F0
+	^
+consts.go:63:2: `plcsButtCap` is unused (deadcode)
+	plcsButtCap LineCapStyle = iota
+	^
+consts.go:65:2: `plcsProjectingSquareCap` is unused (deadcode)
+	plcsProjectingSquareCap
+	^
+consts.go:69:2: `pljsMiterJoin` is unused (deadcode)
+	pljsMiterJoin LineJoinStyle = iota
+	^
+consts.go:70:2: `pljsRoundJoin` is unused (deadcode)
+	pljsRoundJoin
+	^
+consts.go:71:2: `pljsBevelJoin` is unused (deadcode)
+	pljsBevelJoin
+	^
+consts.go:76:2: `lTwo` is unused (deadcode)
+	lTwo
+	^
+consts.go:77:2: `lContinuous` is unused (deadcode)
+	lContinuous
+	^
+consts.go:89:2: `poCompressText` is unused (deadcode)
+	poCompressText
+	^
+consts.go:92:2: `poUseRawJPEG` is unused (deadcode)
+	poUseRawJPEG
+	^
+consts.go:98:2: `poUseImageTransparency` is unused (deadcode)
+	poUseImageTransparency
+	^
+consts.go:105:2: `icNone` is unused (deadcode)
+	icNone ImageCompression = iota
+	^
+consts.go:106:2: `icDeflate` is unused (deadcode)
+	icDeflate
+	^
+consts.go:107:2: `icJPEG` is unused (deadcode)
+	icJPEG
+	^
+consts.go:113:2: `isoCompressed` is unused (deadcode)
+	isoCompressed ImageStreamOption = iota
+	^
+consts.go:114:2: `isoTransparent` is unused (deadcode)
+	isoTransparent
+	^
+consts.go:129:2: `BufSize` is unused (deadcode)
+	BufSize                    = 1024
+	^
+consts.go:134:2: `PDF_MAX_GEN_NUM` is unused (deadcode)
+	PDF_MAX_GEN_NUM            = 65535
+	^
+consts.go:135:2: `PDF_UNICODE_HEADER` is unused (deadcode)
+	PDF_UNICODE_HEADER         = "FEFF001B%s001B"
+	^
+consts.go:136:2: `PDF_LANG_STRING` is unused (deadcode)
+	PDF_LANG_STRING            = "en"
+	^
+consts.go:137:2: `PDF_NUMBER_MASK` is unused (deadcode)
+	PDF_NUMBER_MASK            = "0.####"
+	^
+consts.go:138:2: `rsErrReportFontFileMissing` is unused (deadcode)
+	rsErrReportFontFileMissing = `Font File "%s" does not exist.`
+	^
+consts.go:139:2: `rsErrDictElementNotFound` is unused (deadcode)
+	rsErrDictElementNotFound   = `Error: Dictionary element "%s" not found.`
+	^
+consts.go:140:2: `rsErrInvalidSectionPage` is unused (deadcode)
+	rsErrInvalidSectionPage    = `Error: Invalid section page index.`
+	^
+consts.go:141:2: `rsErrNoGlobalDict` is unused (deadcode)
+	rsErrNoGlobalDict          = `Error: no global XRef named "%s".`
+	^
+consts.go:142:2: `rsErrInvalidPageIndex` is unused (deadcode)
+	rsErrInvalidPageIndex      = `Invalid page index: %d`
+	^
+consts.go:143:2: `rsErrInvalidAnnotIndex` is unused (deadcode)
+	rsErrInvalidAnnotIndex     = `Invalid annot index: %d`
+	^
+consts.go:144:2: `rsErrNoFontDefined` is unused (deadcode)
+	rsErrNoFontDefined         = `No Font was set - please use SetFont() first.`
+	^
+consts.go:145:2: `rsErrNoImageReader` is unused (deadcode)
+	rsErrNoImageReader         = `Unsupported image format - no image reader available.`
+	^
+consts.go:187:2: `_RadToDeg` is unused (deadcode)
+	_RadToDeg = 57.295779513082320876798154814105170332405472466564   // N[180/Pi, 50]
+	^
+font_metrics.go:25:2: `FONT_HELVETICA_ARIAL_DESCENDER` is unused (deadcode)
+	FONT_HELVETICA_ARIAL_DESCENDER = 431
+	^
+font_metrics.go:45:2: `FONT_HELVETICA_ARIAL_BOLD_DESCENDER` is unused (deadcode)
+	FONT_HELVETICA_ARIAL_BOLD_DESCENDER = 210
+	^
+font_metrics.go:66:2: `FONT_HELVETICA_ARIAL_ITALIC_DESCENDER` is unused (deadcode)
+	FONT_HELVETICA_ARIAL_ITALIC_DESCENDER = 208
+	^
+font_metrics.go:7: 7-23 lines are duplicate of `font_metrics.go:28-43` (dupl)
+	FONT_HELVETICA_ARIAL = [256]int{
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		569, 569, 727, 1139, 1139, 1821, 1366, 391, 682, 682, 797, 1196, 569, 682, 569, 569, 1139, 1139,
+		1139, 1139, 1139, 1139, 1139, 1139, 1139, 1139, 569, 569, 1196, 1196, 1196, 1139, 2079, 1366,
+		1366, 1479, 1479, 1366, 1251, 1593, 1479, 569, 1024, 1366, 1139, 1706, 1479, 1593, 1366, 1593,
+		1479, 1366, 1251, 1479, 1366, 1933, 1366, 1366, 1251, 569, 569, 569, 961, 1139, 682, 1139, 1139,
+		1024, 1139, 1139, 569, 1139, 1139, 455, 455, 1024, 455, 1706, 1139, 1139, 1139, 1139, 682, 1024,
+		569, 1139, 1024, 1479, 1024, 1024, 1024, 684, 532, 684, 1196, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 569, 682, 1139, 1139, 1139, 1139,
+		532, 1139, 682, 1509, 758, 1139, 1196, 682, 1509, 1131, 819, 1124, 682, 682, 682, 1180, 1100, 682,
+		682, 682, 748, 1139, 1708, 1708, 1708, 1251, 1366, 1366, 1366, 1366, 1366, 1366, 2048, 1479, 1366,
+		1366, 1366, 1366, 569, 569, 569, 569, 1479, 1479, 1593, 1593, 1593, 1593, 1593, 1196, 1593, 1479,
+		1479, 1479, 1479, 1366, 1366, 1251, 1139, 1139, 1139, 1139, 1139, 1139, 1821, 1024, 1139, 1139,
+		1139, 1139, 569, 569, 569, 569, 1139, 1139, 1139, 1139, 1139, 1139, 1139, 1124, 1251, 1139, 1139,
+		1139, 1139, 1024, 1139, 1024}
+font_metrics.go:28: 28-43 lines are duplicate of `font_metrics.go:48-64` (dupl)
+	FONT_HELVETICA_ARIAL_BOLD = [256]int{1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		569, 682, 971, 1139, 1139, 1821, 1479, 487, 682, 682, 797, 1196, 569, 682, 569, 569, 1139, 1139,
+		1139, 1139, 1139, 1139, 1139, 1139, 1139, 1139, 682, 682, 1196, 1196, 1196, 1251, 1997, 1479,
+		1479, 1479, 1479, 1366, 1251, 1593, 1479, 569, 1139, 1479, 1251, 1706, 1479, 1593, 1366, 1593,
+		1479, 1366, 1251, 1479, 1366, 1933, 1366, 1366, 1251, 682, 569, 682, 1196, 1139, 682, 1139, 1251,
+		1139, 1251, 1139, 682, 1251, 1251, 569, 569, 1139, 569, 1821, 1251, 1251, 1251, 1251, 797, 1139,
+		682, 1251, 1139, 1593, 1139, 1139, 1024, 797, 573, 797, 1196, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 569, 682, 1139, 1139, 1139, 1139,
+		573, 1139, 682, 1509, 758, 1139, 1196, 682, 1509, 1131, 819, 1124, 682, 682, 682, 1180, 1139, 682,
+		682, 682, 748, 1139, 1708, 1708, 1708, 1251, 1479, 1479, 1479, 1479, 1479, 1479, 2048, 1479, 1366,
+		1366, 1366, 1366, 569, 569, 569, 569, 1479, 1479, 1593, 1593, 1593, 1593, 1593, 1196, 1593, 1479,
+		1479, 1479, 1479, 1366, 1366, 1251, 1139, 1139, 1139, 1139, 1139, 1139, 1821, 1139, 1139, 1139,
+		1139, 1139, 569, 569, 569, 569, 1251, 1251, 1251, 1251, 1251, 1251, 1251, 1124, 1251, 1251, 1251,
+		1251, 1251, 1139, 1251, 1139}
+font_metrics.go:48: 48-64 lines are duplicate of `font_metrics.go:69-85` (dupl)
+	FONT_HELVETICA_ARIAL_ITALIC = [256]int{
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		569, 569, 727, 1139, 1139, 1821, 1366, 391, 682, 682, 797, 1196, 569, 682, 569, 569, 1139, 1139,
+		1139, 1139, 1139, 1139, 1139, 1139, 1139, 1139, 569, 569, 1196, 1196, 1196, 1139, 2079, 1366,
+		1366, 1479, 1479, 1366, 1251, 1593, 1479, 569, 1024, 1366, 1139, 1706, 1479, 1593, 1366, 1593,
+		1479, 1366, 1251, 1479, 1366, 1933, 1366, 1366, 1251, 569, 569, 569, 961, 1139, 682, 1139, 1139,
+		1024, 1139, 1139, 569, 1139, 1139, 455, 455, 1024, 455, 1706, 1139, 1139, 1139, 1139, 682, 1024,
+		569, 1139, 1024, 1479, 1024, 1024, 1024, 684, 532, 684, 1196, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 569, 682, 1139, 1139, 1139,
+		1139, 532, 1139, 682, 1509, 758, 1139, 1196, 682, 1509, 1131, 819, 1124, 682, 682, 682, 1180, 1100,
+		682, 682, 682, 748, 1139, 1708, 1708, 1708, 1251, 1366, 1366, 1366, 1366, 1366, 1366, 2048, 1479,
+		1366, 1366, 1366, 1366, 569, 569, 569, 569, 1479, 1479, 1593, 1593, 1593, 1593, 1593, 1196, 1593,
+		1479, 1479, 1479, 1479, 1366, 1366, 1251, 1139, 1139, 1139, 1139, 1139, 1139, 1821, 1024, 1139,
+		1139, 1139, 1139, 569, 569, 569, 569, 1139, 1139, 1139, 1139, 1139, 1139, 1139, 1124, 1251, 1139,
+		1139, 1139, 1139, 1024, 1139, 1024}
+font_metrics.go:69: 69-85 lines are duplicate of `font_metrics.go:90-106` (dupl)
+	FONT_HELVETICA_ARIAL_BOLD_ITALIC = [256]int{
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		569, 682, 971, 1139, 1139, 1821, 1479, 487, 682, 682, 797, 1196, 569, 682, 569, 569, 1139, 1139,
+		1139, 1139, 1139, 1139, 1139, 1139, 1139, 1139, 682, 682, 1196, 1196, 1196, 1251, 1997, 1479,
+		1479, 1479, 1479, 1366, 1251, 1593, 1479, 569, 1139, 1479, 1251, 1706, 1479, 1593, 1366, 1593,
+		1479, 1366, 1251, 1479, 1366, 1933, 1366, 1366, 1251, 682, 569, 682, 1196, 1139, 682, 1139, 1251,
+		1139, 1251, 1139, 682, 1251, 1251, 569, 569, 1139, 569, 1821, 1251, 1251, 1251, 1251, 797, 1139,
+		682, 1251, 1139, 1593, 1139, 1139, 1024, 797, 573, 797, 1196, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536,
+		1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 1536, 569, 682, 1139, 1139, 1139,
+		1139, 573, 1139, 682, 1509, 758, 1139, 1196, 682, 1509, 1131, 819, 1124, 682, 682, 682, 1180, 1139,
+		682, 682, 682, 748, 1139, 1708, 1708, 1708, 1251, 1479, 1479, 1479, 1479, 1479, 1479, 2048, 1479,
+		1366, 1366, 1366, 1366, 569, 569, 569, 569, 1479, 1479, 1593, 1593, 1593, 1593, 1593, 1196, 1593,
+		1479, 1479, 1479, 1479, 1366, 1366, 1251, 1139, 1139, 1139, 1139, 1139, 1139, 1821, 1139, 1139,
+		1139, 1139, 1139, 569, 569, 569, 569, 1251, 1251, 1251, 1251, 1251, 1251, 1251, 1124, 1251, 1251,
+		1251, 1251, 1251, 1139, 1251, 1139}
+font_metrics.go:90: 90-106 lines are duplicate of `font_metrics.go:111-127` (dupl)
+	FONT_TIMES = [256]int{
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		512, 682, 836, 1024, 1024, 1706, 1593, 369, 682, 682, 1024, 1155, 512, 682, 512, 569, 1024, 1024,
+		1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 569, 569, 1155, 1155, 1155, 909, 1886, 1479, 1366,
+		1366, 1479, 1251, 1139, 1479, 1479, 682, 797, 1479, 1251, 1821, 1479, 1479, 1139, 1479, 1366,
+		1139, 1251, 1479, 1479, 1933, 1479, 1479, 1251, 682, 569, 682, 961, 1024, 682, 909, 1024, 909,
+		1024, 909, 682, 1024, 1024, 569, 569, 1024, 569, 1593, 1024, 1024, 1024, 1024, 682, 797, 569,
+		1024, 1024, 1479, 1024, 1024, 909, 983, 410, 983, 1108, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 512, 682, 1024, 1024, 1024, 1024,
+		410, 1024, 682, 1556, 565, 1024, 1155, 682, 1556, 1024, 819, 1124, 614, 614, 682, 1180, 928, 682,
+		682, 614, 635, 1024, 1536, 1536, 1536, 909, 1479, 1479, 1479, 1479, 1479, 1479, 1821, 1366, 1251,
+		1251, 1251, 1251, 682, 682, 682, 682, 1479, 1479, 1479, 1479, 1479, 1479, 1479, 1155, 1479, 1479,
+		1479, 1479, 1479, 1479, 1139, 1024, 909, 909, 909, 909, 909, 909, 1366, 909, 909, 909, 909, 909,
+		569, 569, 569, 569, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1124, 1024, 1024, 1024, 1024, 1024,
+		1024, 1024, 1024}
+font_metrics.go:111: 111-127 lines are duplicate of `font_metrics.go:132-148` (dupl)
+	FONT_TIMES_ITALIC = [256]int{
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		512, 682, 860, 1024, 1024, 1706, 1593, 438, 682, 682, 1024, 1382, 512, 682, 512, 569, 1024, 1024,
+		1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 682, 682, 1382, 1382, 1382, 1024, 1884, 1251,
+		1251, 1366, 1479, 1251, 1251, 1479, 1479, 682, 909, 1366, 1139, 1706, 1366, 1479, 1251, 1479,
+		1251, 1024, 1139, 1479, 1251, 1706, 1251, 1139, 1139, 797, 569, 797, 864, 1024, 682, 1024, 1024,
+		909, 1024, 909, 569, 1024, 1024, 569, 569, 909, 569, 1479, 1024, 1024, 1024, 1024, 797, 797, 569,
+		1024, 909, 1366, 909, 909, 797, 819, 563, 819, 1108, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 512, 797, 1024, 1024, 1024, 1024,
+		563, 1024, 682, 1556, 565, 1024, 1382, 682, 1556, 1024, 819, 1124, 614, 614, 682, 1180, 1071, 512,
+		682, 614, 635, 1024, 1536, 1536, 1536, 1024, 1251, 1251, 1251, 1251, 1251, 1251, 1821, 1366, 1251,
+		1251, 1251, 1251, 682, 682, 682, 682, 1479, 1366, 1479, 1479, 1479, 1479, 1479, 1382, 1479, 1479,
+		1479, 1479, 1479, 1139, 1251, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1366, 909, 909, 909, 909,
+		909, 569, 569, 569, 569, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1124, 1024, 1024, 1024, 1024,
+		1024, 909, 1024, 909}
+font_metrics.go:132: 132-148 lines are duplicate of `font_metrics.go:153-169` (dupl)
+	FONT_TIMES_BOLD = [256]int{
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		512, 682, 1137, 1024, 1024, 2048, 1706, 569, 682, 682, 1024, 1167, 512, 682, 512, 569, 1024, 1024,
+		1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 682, 682, 1167, 1167, 1167, 1024, 1905, 1479,
+		1366, 1479, 1479, 1366, 1251, 1593, 1593, 797, 1024, 1593, 1366, 1933, 1479, 1593, 1251, 1593,
+		1479, 1139, 1366, 1479, 1479, 2048, 1479, 1479, 1366, 682, 569, 682, 1190, 1024, 682, 1024, 1139,
+		909, 1139, 909, 682, 1024, 1139, 569, 682, 1139, 569, 1706, 1139, 1024, 1139, 1139, 909, 797, 682,
+		1139, 1024, 1479, 1024, 1024, 909, 807, 451, 807, 1065, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 512, 682, 1024, 1024, 1024, 1024, 451,
+		1024, 682, 1530, 614, 1024, 1167, 682, 1530, 1024, 819, 1124, 614, 614, 682, 1180, 1106, 683, 682,
+		614, 676, 1024, 1536, 1536, 1536, 1024, 1479, 1479, 1479, 1479, 1479, 1479, 2048, 1479, 1366,
+		1366, 1366, 1366, 797, 797, 797, 797, 1479, 1479, 1593, 1593, 1593, 1593, 1593, 1167, 1593, 1479,
+		1479, 1479, 1479, 1479, 1251, 1139, 1024, 1024, 1024, 1024, 1024, 1024, 1479, 909, 909, 909, 909,
+		909, 569, 569, 569, 569, 1024, 1139, 1024, 1024, 1024, 1024, 1024, 1124, 1024, 1139, 1139, 1139,
+		1139, 1024, 1139, 1024}
+font_metrics.go:153: 153-169 lines are duplicate of `font_metrics.go:174-190` (dupl)
+	FONT_TIMES_BOLD_ITALIC = [256]int{
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		512, 797, 1137, 1024, 1024, 1706, 1593, 569, 682, 682, 1024, 1167, 512, 682, 512, 569, 1024, 1024,
+		1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 682, 682, 1167, 1167, 1167, 1024, 1704, 1366,
+		1366, 1366, 1479, 1366, 1366, 1479, 1593, 797, 1024, 1366, 1251, 1821, 1479, 1479, 1251, 1479,
+		1366, 1139, 1251, 1479, 1366, 1821, 1366, 1251, 1251, 682, 569, 682, 1167, 1024, 682, 1024, 1024,
+		909, 1024, 909, 682, 1024, 1139, 569, 569, 1024, 569, 1593, 1139, 1024, 1024, 1024, 797, 797, 569,
+		1139, 909, 1366, 1024, 909, 797, 713, 451, 713, 1167, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593,
+		1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 1593, 512, 797, 1024, 1024, 1024, 1024, 451,
+		1024, 682, 1530, 545, 1024, 1241, 682, 1530, 1024, 819, 1124, 614, 614, 682, 1180, 1024, 512, 682,
+		614, 614, 1024, 1536, 1536, 1536, 1024, 1366, 1366, 1366, 1366, 1366, 1366, 1933, 1366, 1366,
+		1366, 1366, 1366, 797, 797, 797, 797, 1479, 1479, 1479, 1479, 1479, 1479, 1479, 1167, 1479, 1479,
+		1479, 1479, 1479, 1251, 1251, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1479, 909, 909, 909, 909,
+		909, 569, 569, 569, 569, 1024, 1139, 1024, 1024, 1024, 1024, 1024, 1124, 1024, 1139, 1139, 1139,
+		1139, 909, 1024, 909}
+font_metrics.go:174: 174-190 lines are duplicate of `font_metrics.go:195-207` (dupl)
+	FONT_COURIER_FULL = [256]int{
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229,
+		1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229, 1229}
+font_metrics.go:195: 195-207 lines are duplicate of `font_metrics.go:210-222` (dupl)
+	FONT_SYMBOL = [256]int{
+		250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250,
+		250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 333, 713, 500, 549, 833, 778, 439, 333, 333, 500, 549,
+		250, 549, 250, 278, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 278, 278, 549, 549, 549, 444, 549, 722,
+		667, 722, 612, 611, 763, 603, 722, 333, 631, 722, 686, 889, 722, 722, 768, 741, 556, 592, 611, 690, 439, 768,
+		645, 795, 611, 333, 863, 333, 658, 500, 500, 631, 549, 549, 494, 439, 521, 411, 603, 329, 603, 549, 549, 576,
+		521, 549, 549, 521, 549, 603, 439, 576, 713, 686, 493, 686, 494, 480, 200, 480, 549, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 750, 620, 247, 549, 167, 713, 500, 753, 753, 753, 753, 1042, 987, 603, 987, 603,
+		400, 549, 411, 549, 549, 713, 494, 460, 549, 549, 549, 549, 1000, 603, 1000, 658, 823, 686, 795, 987, 768, 768,
+		823, 768, 768, 713, 713, 713, 713, 713, 713, 713, 768, 713, 790, 790, 890, 823, 549, 250, 713, 603, 603, 1042,
+		987, 603, 987, 603, 494, 329, 790, 790, 786, 713, 384, 384, 384, 384, 384, 384, 494, 494, 494, 494, 0, 329,
+		274, 686, 686, 686, 384, 384, 384, 384, 384, 384, 494, 494, 494, 0}
+font_metrics.go:210: 210-222 lines are duplicate of `font_metrics.go:7-23` (dupl)
+	FONT_ZAPFDINGBATS = [256]int{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 278, 974, 961, 974, 980, 719, 789, 790, 791, 690, 960, 939,
+		549, 855, 911, 933, 911, 945, 974, 755, 846, 762, 761, 571, 677, 763, 760, 759, 754, 494, 552, 537, 577, 692,
+		786, 788, 788, 790, 793, 794, 816, 823, 789, 841, 823, 833, 816, 831, 923, 744, 723, 749, 790, 792, 695, 776,
+		768, 792, 759, 707, 708, 682, 701, 826, 815, 789, 789, 707, 687, 696, 689, 786, 787, 713, 791, 785, 791, 873,
+		761, 762, 762, 759, 759, 892, 892, 788, 784, 438, 138, 277, 415, 392, 392, 668, 668, 0, 390, 390, 317, 317,
+		276, 276, 509, 509, 410, 410, 234, 234, 334, 334, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 732, 544, 544, 910, 667, 760, 760, 776, 595, 694, 626, 788, 788, 788, 788,
+		788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788,
+		788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 788, 894, 838, 1016, 458, 748, 924, 748, 918,
+		927, 928, 928, 834, 873, 828, 924, 924, 917, 930, 931, 463, 883, 836, 836, 867, 867, 696, 696, 874, 0, 874,
+		760, 946, 771, 865, 771, 888, 967, 888, 831, 873, 927, 970, 918, 0}
+streams.go:38:10: Error return value of `io.Copy` is not checked (errcheck)
+		io.Copy(&ms.buffer, r) 
+		       ^
+t1_test.go:26:16: Error return value of `pdf.SaveToFile` is not checked (errcheck)
+	pdf.SaveToFile("test-stdfont.pdf")
+	              ^
+t1_test.go:66:16: Error return value of `pdf.SaveToFile` is not checked (errcheck)
+	pdf.SaveToFile("test.pdf")
+	              ^
+document.go:395:2: use of `fmt.Print` forbidden by pattern `^(fmt\.Print(|f|ln)|print|println)$` (forbidigo)
+	fmt.Print(msg)
+	^
+document.go:397:2: use of `fmt.Println` forbidden by pattern `^(fmt\.Print(|f|ln)|print|println)$` (forbidigo)
+	fmt.Println("")
+	^
+document.go:407:5: use of `fmt.Println` forbidden by pattern `^(fmt\.Print(|f|ln)|print|println)$` (forbidigo)
+				fmt.Println("adding font to page:", aName, aNum)
+				^
+dict.go:40: Function 'WriteDictionary' is too long (84 > 60) (funlen)
+func (dict *Dictionary) WriteDictionary(AObject int, st PDFWriter) {
+text.go:257: Function 'Encode' is too long (83 > 60) (funlen)
+func (t *Text) Encode(st PDFWriter) {
+writer.go:9: File is not `gci`-ed with --skip-generated -s standard -s default (gci)
+
+writer.go:28: File is not `gci`-ed with --skip-generated -s standard -s default (gci)
+	return &fwriter{w : w}
+writer.go:60: File is not `gci`-ed with --skip-generated -s standard -s default (gci)
+
+font_metrics.go:242:7: string `Times-Italic` has 4 occurrences, make it a constant (goconst)
+	case "Times-Italic":
+	     ^
+font_metrics.go:246:17: string `ZapfDingbats` has 4 occurrences, make it a constant (goconst)
+	case "Symbol", "ZapfDingbats":
+	               ^
+font_metrics.go:238:7: string `Times-Roman` has 4 occurrences, make it a constant (goconst)
+	case "Times-Roman":
+	     ^
+font_metrics.go:236:7: string `Helvetica-BoldOblique` has 4 occurrences, make it a constant (goconst)
+	case "Helvetica-BoldOblique":
+	     ^
+font_metrics.go:240:7: string `Times-Bold` has 4 occurrences, make it a constant (goconst)
+	case "Times-Bold":
+	     ^
+font_metrics.go:228:53: string `Courier-BoldOblique` has 4 occurrences, make it a constant (goconst)
+	case "Courier", "Courier-Bold", "Courier-Oblique", "Courier-BoldOblique":
+	                                                   ^
+font_metrics.go:230:7: string `Helvetica` has 4 occurrences, make it a constant (goconst)
+	case "Helvetica":
+	     ^
+font_metrics.go:244:7: string `Times-BoldItalic` has 4 occurrences, make it a constant (goconst)
+	case "Times-BoldItalic":
+	     ^
+font_metrics.go:234:7: string `Helvetica-Oblique` has 4 occurrences, make it a constant (goconst)
+	case "Helvetica-Oblique":
+	     ^
+font_metrics.go:232:7: string `Helvetica-Bold` has 4 occurrences, make it a constant (goconst)
+	case "Helvetica-Bold":
+	     ^
+dict.go:61:5: commentFormatting: put a space between `//` and comment text (gocritic)
+				//if E.Key.FName == "Name" {
+				^
+document.go:55:31: captLocal: `AValue' should not be capitalized (gocritic)
+func (d *Document) SetOptions(AValue ...Option) {
+                              ^
+document.go:94:34: captLocal: `AXRef' should not be capitalized (gocritic)
+func (d *Document) AddGlobalXRef(AXRef *XRef) int {
+                                 ^
+document.go:111:25: captLocal: `AIndex' should not be capitalized (gocritic)
+func (d *Document) GetX(AIndex int) *XRef {
+                        ^
+document.go:137:33: captLocal: `AFileName' should not be capitalized (gocritic)
+func (doc *Document) SaveToFile(AFileName string) error {
+                                ^
+document.go:223:38: captLocal: `UseUTF16' should not be capitalized (gocritic)
+func (doc *Document) CreateInfoEntry(UseUTF16 bool) {
+                                     ^
+document.go:260:38: captLocal: `Subtype' should not be capitalized (gocritic)
+func (doc *Document) AddOutputIntent(Subtype, OutputConditionIdentifier, Info string,
+                                     ^
+document.go:261:2: captLocal: `ICCProfile' should not be capitalized (gocritic)
+	ICCProfile io.Reader) {
+	^
+document.go:309:39: captLocal: `Parent' should not be capitalized (gocritic)
+func (doc *Document) CreatePagesEntry(Parent int) int {
+                                      ^
+document.go:680:42: captLocal: `APageNum' should not be capitalized (gocritic)
+func (doc *Document) CreateContentsEntry(APageNum int) int {
+                                         ^
+document.go:690:39: captLocal: `APage' should not be capitalized (gocritic)
+func (doc *Document) CreatePageStream(APage *Page, PageNum int) {
+                                      ^
+document.go:708:47: captLocal: `S' should not be capitalized (gocritic)
+func (doc *Document) CreateSectionPageOutLine(S *Section, PageOutLine, PageIndex, NewPage, ParentOutline, NextOutline, PrevOutLine int) int {
+                                              ^
+document.go:736:43: captLocal: `SectionIndex' should not be capitalized (gocritic)
+func (doc *Document) CreateSectionOutLine(SectionIndex, OutLineRoot, ParentOutLine, NextSect, PrevSect int) int {
+                                          ^
+document.go:855:41: captLocal: `APage' should not be capitalized (gocritic)
+func (doc *Document) CreateEmbeddedFont(APage *Page, AFontIndex int, AFontSize float64, ASimulateBold, ASimulateItalic bool) *EmbeddedFont {
+                                        ^
+document.go:879:29: captLocal: `AName' should not be capitalized (gocritic)
+func (d *Document) FindFont(AName string) int {
+                            ^
+font_metrics.go:254:32: captLocal: `AFontName' should not be capitalized (gocritic)
+func GetStdFontCharWidthsArray(AFontName string) FontWidthArray {
+                               ^
+font_metrics.go:131:2: commentFormatting: put a space between `//` and comment text (gocritic)
+	//timesB  (used metric equivalent Liberation Serif Bold as substitute)
+	^
+fonts.go:26:24: captLocal: `ADocument' should not be capitalized (gocritic)
+func NewEmbeddedFontEx(ADocument *Document, APage *Page, AFont int, ASize float64, ASimulateBold, ASimulateItalic bool) *EmbeddedFont {
+                       ^
+fonts.go:53:42: captLocal: `ADocument' should not be capitalized (gocritic)
+func (f *EmbeddedFont) WriteEmbeddedFont(ADocument *Document, Src io.Reader, st PDFWriter) int {
+                                         ^
+fonts.go:131:32: captLocal: `AText' should not be capitalized (gocritic)
+func (f *Font) GetGlyphIndices(AText string) string {
+                               ^
+fonts.go:154:37: captLocal: `AText' should not be capitalized (gocritic)
+func (f *Font) AddTextToMappingList(AText string) {
+                                    ^
+fonts.go:187:21: captLocal: `AFontName' should not be capitalized (gocritic)
+func IsStandardFont(AFontName string) bool {
+                    ^
+funcs.go:163:3: assignOp: replace `b = b >> 3` with `b >>= 3` (gocritic)
+		b = b >> 3
+		^
+funcs.go:15:18: captLocal: `ADate' should not be capitalized (gocritic)
+func GetLocalTZD(ADate time.Time, ISO8601 bool) string {
+                 ^
+funcs.go:34:20: captLocal: `ADate' should not be capitalized (gocritic)
+func DateToPdfDate(ADate time.Time) string {
+                   ^
+funcs.go:47:21: captLocal: `AFrom' should not be capitalized (gocritic)
+func CompressStream(AFrom, ATo *bytes.Buffer, ACompressLevel CompressionLevel, ASkipHeader bool) {
+                    ^
+funcs.go:81:14: captLocal: `APixels' should not be capitalized (gocritic)
+func PDFTomm(APixels float64) float64 {
+             ^
+funcs.go:89:14: captLocal: `APixels' should not be capitalized (gocritic)
+func PDFtoCM(APixels float64) float64 {
+             ^
+funcs.go:93:18: captLocal: `Inches' should not be capitalized (gocritic)
+func InchesToPDF(Inches float64) float64 {
+                 ^
+funcs.go:96:18: captLocal: `APixels' should not be capitalized (gocritic)
+func PDFtoInches(APixels float64) float64 {
+                 ^
+funcs.go:168:23: captLocal: `APoint' should not be capitalized (gocritic)
+func DoUnitConversion(APoint *Coord, uofm UnitOfMeasure) {
+                      ^
+funcs.go:139:30: commentFormatting: put a space between `//` and comment text (gocritic)
+	if f == float64(int64(f)) { //is a whole number
+	                            ^
+graphobjs.go:67:30: captLocal: `ADocument' should not be capitalized (gocritic)
+func NewTPDFPopGraphicsStack(ADocument *Document) *PopGraphicsStack {
+                             ^
+graphobjs.go:148:25: captLocal: `ACtrl1' should not be capitalized (gocritic)
+func (t CurveC) Command(ACtrl1, ACtrl2, ATo3 Coord) string {
+                        ^
+graphobjs.go:279:32: captLocal: `APos' should not be capitalized (gocritic)
+func (ls *LineSegment) Command(APos Coord) string {
+                               ^
+graphobjs.go:287:38: captLocal: `APos1' should not be capitalized (gocritic)
+func (ls *LineSegment) CommandCoords(APos1, APos2 Coord) string {
+                                     ^
+graphobjs.go:111:2: ifElseChain: rewrite if-else to switch statement (gocritic)
+	if t.Stroke && t.Fill {
+	^
+graphobjs.go:316:2: ifElseChain: rewrite if-else to switch statement (gocritic)
+	if r.Stroke && r.Fill {
+	^
+page.go:43:26: captLocal: `AIndex' should not be capitalized (gocritic)
+func (p *Page) GetObject(AIndex int) Encoder {
+                         ^
+page.go:104:37: captLocal: `AText' should not be capitalized (gocritic)
+func (p *Page) AddTextToLookupLists(AText string) {
+                                    ^
+page.go:137:55: captLocal: `ASimulateBold' should not be capitalized (gocritic)
+func (p *Page) SetFontEx(fontIdx int, fontSz float64, ASimulateBold, ASimulateItalic bool) {
+                                                      ^
+page.go:142:25: captLocal: `AColor' should not be capitalized (gocritic)
+func (p *Page) SetColor(AColor ARGBColor, AStroke bool) {
+                        ^
+page.go:278:40: captLocal: `AWidth' should not be capitalized (gocritic)
+func (p *Page) DrawEllipse(posx, posY, AWidth, AHeight, ALineWidth float64, AFill, AStroke bool, degs float32) {
+                                       ^
+page.go:296:42: captLocal: `AWidth' should not be capitalized (gocritic)
+func (p *Page) DrawEllipsePos(pos Coord, AWidth, AHeight, ALineWidth float64, AFill, AStroke bool, degs float32) {
+                                         ^
+page.go:313:28: captLocal: `Y' should not be capitalized (gocritic)
+func (p *Page) DrawRect(x, Y, W, H, ALineWidth float64, AFill, AStroke bool, degs float32) {
+                           ^
+page.go:334:41: captLocal: `W' should not be capitalized (gocritic)
+func (p *Page) DrawRectCoord(pos Coord, W, H, ALineWidth float64, AFill, AStroke bool, degs float32) {
+                                        ^
+page.go:338:35: captLocal: `Y' should not be capitalized (gocritic)
+func (p *Page) DrawRoundedRect(x, Y, W, H, ARadius, ALineWidth float64, AFill, AStroke bool, degs float32) {
+                                  ^
+page.go:361:28: captLocal: `APoints' should not be capitalized (gocritic)
+func (p *Page) DrawPolygon(APoints []Coord, ALineWidth float64) {
+                           ^
+page.go:366:29: captLocal: `APoints' should not be capitalized (gocritic)
+func (p *Page) DrawPolyLine(APoints []Coord, ALineWidth float64) {
+                            ^
+page.go:418:37: captLocal: `Y' should not be capitalized (gocritic)
+func (p *Page) CreateStdFontText(x, Y float64, AText string, AFont *EmbeddedFont, degs float32, AUnderline, AStrikethrough bool) {
+                                    ^
+color.go:63:10: Comment should end in a period (godot)
+// FIXME:
+         ^
+consts.go:3:61: Comment should end in a period (godot)
+// Some popular predefined colors. Channel format is: RRGGBB
+                                                            ^
+consts.go:121:58: Comment should end in a period (godot)
+	// other compression levels can be added here, if needed
+	                                                        ^
+dict.go:22: dict.go:22: Line contains TODO/BUG/FIXME: "FIXME: check that MustEscape should be f..." (godox)
+	//FIXME: check that MustEscape should be false 
+dict.go:47: dict.go:47: Line contains TODO/BUG/FIXME: "FIXME:  what is this about" (godox)
+//FIXME:  what is this about 	
+document.go:79: document.go:79: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+	//FIXME:
+document.go:99: document.go:99: Line contains TODO/BUG/FIXME: "FIXME: check this is correct" (godox)
+// FIXME: check this is correct
+document.go:183: document.go:183: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+//FIXME:
+document.go:188: document.go:188: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+//FIXME:
+document.go:233: document.go:233: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+			//FIXME:
+document.go:684: document.go:684: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+	//FIXME:
+fonts.go:58: fonts.go:58: Line contains TODO/BUG/FIXME: "FIXME: which CompressedStream to use" (godox)
+		//FIXME: which CompressedStream to use
+fonts.go:62: fonts.go:62: Line contains TODO/BUG/FIXME: "FIXME: handle errors" (godox)
+		//FIXME: handle errors
+funcs.go:72: funcs.go:72: Line contains TODO/BUG/FIXME: "FIXME" (godox)
+	// FIXME
+page.go:13: page.go:13: Line contains TODO/BUG/FIXME: "FIXME: re-enable" (godox)
+	//FIXME: re-enable
+page.go:105: page.go:105: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+	//FIXME:
+page.go:150: page.go:150: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+//FIXME:
+page.go:267: page.go:267: Line contains TODO/BUG/FIXME: "FIXME: is per-local formatting needed" (godox)
+	//FIXME: is per-local formatting needed
+page.go:272: page.go:272: Line contains TODO/BUG/FIXME: "FIXME: this when per-local formatting wa..." (godox)
+	//FIXME: this when per-local formatting was used (using tn ); I replaced
+page.go:372: page.go:372: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+		//FIXME:
+text.go:40: text.go:40: Line contains TODO/BUG/FIXME: "FIXME:" (godox)
+		//FIXME:
+dict.go:9: File is not `gofmt`-ed with `-s` (gofmt)
+	Key  *PDFName
+color.go:41: File is not `gofumpt`-ed (gofumpt)
+}
+color.go:161: File is not `gofumpt`-ed (gofumpt)
+	0xFF, 0xFF, 0xFB, 0xA1, 0xFF, 0xFF, 0xFD, 0xA2, 0x00, 0x00, 0x03, 0xDB, 0x00, 0x00, 0xC0, 0x75}
+dict.go:183: File is not `gofumpt`-ed (gofumpt)
+	}	
+dict.go:118: File is not `goimports`-ed (goimports)
+				// }
+color.go:66:5: don't use underscores in Go names; var `ICC_sRGB2014` should be `ICCSRGB2014` (golint)
+var ICC_sRGB2014 = [3024]byte{
+    ^
+consts.go:131:2: don't use ALL_CAPS in Go names; use CamelCase (golint)
+	PDF_VERSION                = "%PDF-1.3"
+	^
+consts.go:132:2: don't use ALL_CAPS in Go names; use CamelCase (golint)
+	PDF_BINARY_BLOB            = "%" + "\xC3\xA4" + "\xC3\xBC" + "\xC3\xB6" + "\xC3\x9F"
+	^
+consts.go:133:2: don't use ALL_CAPS in Go names; use CamelCase (golint)
+	PDF_FILE_END               = "%%EOF"
+	^
+document.go:62:1: receiver name doc should be consistent with previous receiver name d for Document (golint)
+func (doc *Document) hasOption(opt Option) bool {
+^
+document.go:66:1: receiver name doc should be consistent with previous receiver name d for Document (golint)
+func (doc *Document) StartDocument() {
+^
+document.go:101:1: receiver name doc should be consistent with previous receiver name d for Document (golint)
+func (doc *Document) CreateRefTable() {
+^
+graphobjs.go:16:1: receiver name m should be consistent with previous receiver name t for MoveTo (golint)
+func (m *MoveTo) Encode(st PDFWriter) {
+^
+graphobjs.go:20:1: receiver name m should be consistent with previous receiver name t for MoveTo (golint)
+func (m MoveTo) Command(pos Coord) string {
+^
+graphobjs.go:27:1: receiver name r should be consistent with previous receiver name t for ResetPath (golint)
+func (r *ResetPath) Encode(st PDFWriter) {
+^
+graphobjs.go:34:1: receiver name c should be consistent with previous receiver name t for ClosePath (golint)
+func (c *ClosePath) Encode(st PDFWriter) {
+^
+graphobjs.go:41:1: receiver name s should be consistent with previous receiver name t for StrokePath (golint)
+func (s *StrokePath) Encode(st PDFWriter) {
+^
+graphobjs.go:48:1: receiver name c should be consistent with previous receiver name t for ClipPath (golint)
+func (c *ClipPath) Encode(st PDFWriter) {
+^
+graphobjs.go:268:1: receiver name ls should be consistent with previous receiver name t for LineSegment (golint)
+func (ls *LineSegment) Encode(st PDFWriter) {
+^
+graphobjs.go:283:1: receiver name ls should be consistent with previous receiver name t for LineSegment (golint)
+func (ls *LineSegment) CommandXY(x1, y1 float64) string {
+^
+graphobjs.go:311:1: receiver name r should be consistent with previous receiver name t for Rectangle (golint)
+func (r *Rectangle) Encode(st PDFWriter) {
+^
+graphobjs.go:337:1: receiver name rr should be consistent with previous receiver name t for RoundedRectangle (golint)
+func (rr *RoundedRectangle) Encode(st PDFWriter) {}
+^
+graphobjs.go:377:1: receiver name s should be consistent with previous receiver name t for Surface (golint)
+func (s *Surface) Encode(st PDFWriter) {
+^
+graphobjs.go:407:1: receiver name ls should be consistent with previous receiver name t for LineStyle (golint)
+func (ls *LineStyle) Encode(st PDFWriter) {
+^
+graphobjs.go:452:1: receiver name cs should be consistent with previous receiver name t for CapStyle (golint)
+func (cs *CapStyle) Encode(st PDFWriter) {
+^
+graphobjs.go:467:1: receiver name js should be consistent with previous receiver name t for JoinStyle (golint)
+func (js *JoinStyle) Encode(st PDFWriter) {
+^
+writer.go:27:30: exported func Newfwriter returns unexported type *github.com/drgo/pdf.fwriter, which can be annoying to use (golint)
+func Newfwriter(w io.Writer) *fwriter {
+                             ^
+writer.go:61:23: exported func NewfTestWriter returns unexported type *github.com/drgo/pdf.fwriter, which can be annoying to use (golint)
+func NewfTestWriter() *fwriter {
+                      ^
+funcs.go:6:2: G501: Blocklisted import crypto/md5: weak cryptographic primitive (gosec)
+	"crypto/md5"
+	^
+funcs.go:195:10: G401: Use of weak cryptographic primitive (gosec)
+	hash := md5.Sum([]byte(text))
+	        ^
+color.go:67: line is 192 characters (lll)
+	0x00, 0x00, 0x0B, 0xD0, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x6D, 0x6E, 0x74, 0x72, 0x52, 0x47, 0x42, 0x20, 0x58, 0x59, 0x5A, 0x20, 0x07, 0xDF, 0x00, 0x02, 0x00, 0x0F, 0x00, 0x00,
+color.go:68: line is 192 characters (lll)
+	0x00, 0x00, 0x00, 0x00, 0x61, 0x63, 0x73, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+color.go:69: line is 192 characters (lll)
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF6, 0xD6, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0xD3, 0x2D, 0x00, 0x00, 0x00, 0x00, 0x3D, 0x0E, 0xB2, 0xDE, 0xAE, 0x93, 0x97, 0xBE, 0x9B, 0x67, 0x26, 0xCE,
+document.go:294: line is 125 characters (lll)
+		doc.Infos.Title + doc.Infos.Author + doc.Infos.ApplicationName + doc.Infos.Producer + DateToPdfDate(doc.Infos.CreationDate)
+document.go:758: line is 137 characters (lll)
+	var result, treeRoot, outlineRoot, pc, j, parentOutline, pageNum, pageOutline, nextOutline, nextSect, newPage, prevOutline, prevSect int
+document.go:859: line is 154 characters (lll)
+// func (doc *TPDFDocument) CreateText(X, Y float64, AText string, AFont *TPDFEmbeddedFont, ADegrees float32, AUnderline, AStrikethrough bool) *TPDFText {
+document.go:863: line is 162 characters (lll)
+// func (doc *TPDFDocument) CreateUTF8Text(X, Y float64, AText string, AFont *TPDFEmbeddedFont, ADegrees float32, AUnderline, AStrikethrough bool) *TPDFUTF8Text {
+document.go:867: line is 164 characters (lll)
+// func (doc *TPDFDocument) CreateUTF16Text(X, Y float64, AText string, AFont *TPDFEmbeddedFont, ADegrees float32, AUnderline, AStrikethrough bool) *TPDFUTF16Text {
+document.go:875: line is 136 characters (lll)
+// func (doc *TPDFDocument) CreateRoundedRectangle(X, Y, W, H, ARadius, ALineWidth float64, AFill, AStroke bool) *TPDFRoundedRectangle {
+fonts.go:181: line is 121 characters (lll)
+	// 	s += fmt.Sprintf(" %d [%d]", item.GlyphID, TTTFFriendClass(lFont).ToNatural(lFont.Widths[lWidthIndex].AdvanceWidth))
+graphobjs.go:156: line is 197 characters (lll)
+	st.WriteString(FloatStr(t.Ctrl1.x) + " " + FloatStr(t.Ctrl1.y) + " " + FloatStr(t.Ctrl2.x) + " " + FloatStr(t.Ctrl2.y) + " " + FloatStr(t.To.x) + " " + FloatStr(t.To.y) + " c" + CRLF) // was , st)
+graphobjs.go:196: line is 135 characters (lll)
+	st.WriteString(FloatStr(t.P1.x) + " " + FloatStr(t.P1.y) + " " + FloatStr(t.P3.x) + " " + FloatStr(t.P3.y) + " y" + CRLF) // was , st)
+graphobjs.go:235: line is 135 characters (lll)
+	st.WriteString(FloatStr(t.P2.x) + " " + FloatStr(t.P2.y) + " " + FloatStr(t.P3.x) + " " + FloatStr(t.P3.y) + " v" + CRLF) // was , st)
+graphobjs.go:315: line is 162 characters (lll)
+	st.WriteString(FloatStr(r.TopLeft.x) + " " + FloatStr(r.TopLeft.y) + " " + FloatStr(r.Dimensions.x) + " " + FloatStr(r.Dimensions.y) + " re" + CRLF) // was , st)
+graphobjs.go:349: line is 137 characters (lll)
+func NewRoundedRectangle(document *Document, posX, posY, width, height, radius, lineWidth float64, fill, stroke bool) *RoundedRectangle {
+meta.go:49: line is 149 characters (lll)
+// func NewTPDFAnnotDetailed(ADocument *TPDFDocument, ALeft, ABottom, AWidth, AHeight float64, AURI string, ABorder, AExternalLink bool) *TPDFAnnot {
+page.go:249: line is 121 characters (lll)
+// 		p.AddObject(NewTPDFFreeFormString(p.FDocument, fmt.Sprintf("%s %s %s %s %.4f %.4f cm", t1, t2, t3, t1, p1.x, p1.y)))
+page.go:275: line is 129 characters (lll)
+	p.AddObject(NewFreeFormString(p.Document, fmt.Sprintf("%.4f %.4f %.4f %.4f %.4f %.4f cm", radc, -rads, rads, radc, p1.x, p1.y)))
+page.go:422: line is 141 characters (lll)
+// func (p *TPDFPage) CreateTTFFontText(x, Y float64, AText string, AFont *TPDFEmbeddedFont, degs float32, AUnderline, AStrikethrough bool) {
+text.go:280: line is 128 characters (lll)
+	// //    convert the Font Units to Millimeters. This is also because fontcache DPI (default 96) could differ from PDF DPI (72).
+text.go:300: line is 146 characters (lll)
+	// //     WriteString(Format('0 %s m %s %0:s l S', [FloatStr(mmToPDF(lTextHeightInMM) / 2), FloatStr(mmToPDF(lTextWidthInMM))]) + CRLF, AStream);
+text.go:325: line is 129 characters (lll)
+	// 	st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lUnderlinePos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
+text.go:339: line is 129 characters (lll)
+	// 	st.WriteString(fmt.Sprintf("0 %s m %s %s l S%s", FloatStr(mmToPDF(lStrikeOutPos)), FloatStr(mmToPDF(lTextWidthInMM)), CRLF))
+text.go:347: line is 127 characters (lll)
+//   { convert the Font Units to Millimeters. This is also because fontcache DPI (default 96) could differ from PDF DPI (72). }
+text.go:367: line is 142 characters (lll)
+//     WriteString(Format('0 %s m %s %0:s l S', [FloatStr(mmToPDF(lTextHeightInMM) / 2), FloatStr(mmToPDF(lTextWidthInMM))]) + CRLF, AStream);
+text.go:481: line is 165 characters (lll)
+// func NewTPDFUTF8Text(doc *TPDFDocument, AX, AY float64, AText string, AFont *TPDFEmbeddedFont, ADegrees Tfloat64, AUnderline, AStrikeThrough bool) *TPDFUTF8Text {
+text.go:597: line is 167 characters (lll)
+//	func NewTPDFUTF16Text(doc *TPDFDocument, AX, AY float64, AText string, AFont *TPDFEmbeddedFont, ADegrees Tfloat64, AUnderline, AStrikeThrough bool) *TPDFUTF16Text {
+text.go:679: line is 142 characters (lll)
+// 			st.WriteString(fmt.Sprintf("<%s> <%s> <%s>", IntToHex(lst[i].GlyphID, 4), IntToHex(lst[i].GlyphID, 4), IntToHex(lst[i].CharID, 4))+CRLF)
+color.go:21:12: struct of size 80 bytes could be of size 72 bytes (maligned)
+type Color struct {
+           ^
+graphobjs.go:84:14: struct of size 72 bytes could be of size 64 bytes (maligned)
+type Ellipse struct {
+             ^
+text.go:166:15: struct of size 64 bytes could be of size 56 bytes (maligned)
+type BaseText struct {
+              ^
+objects.go:112:2: `if n.Name != ""` has complex nested blocks (complexity: 5) (nestif)
+	if n.Name != "" {
+	^
+color.go:64:24: unused-parameter: parameter 'st' seems to be unused, consider removing or renaming it as _ (revive)
+func (c *Color) Encode(st PDFWriter) {}
+                       ^
+t1_test.go:8:21: unused-parameter: parameter 't' seems to be unused, consider removing or renaming it as _ (revive)
+func TestStdFontPDF(t *testing.T) {
+                    ^
+graphobjs.go:141:27: unused-parameter: parameter 'xCtrl1' seems to be unused, consider removing or renaming it as _ (revive)
+func (t CurveC) CommandXY(xCtrl1, yCtrl1, xCtrl2, yCtrl2, xTo, yTo float64) string {
+                          ^
+streams.go:53:30: unused-parameter: parameter 'st' seems to be unused, consider removing or renaming it as _ (revive)
+func (xs *TXMPStream) Encode(st PDFWriter) {
+                             ^
+page.go:38:23: unused-parameter: parameter 'st' seems to be unused, consider removing or renaming it as _ (revive)
+func (p *Page) Encode(st PDFWriter) {}
+                      ^
+objects.go:68:17: unused-parameter: parameter 'doc' seems to be unused, consider removing or renaming it as _ (revive)
+func NewBoolean(doc *Document, val bool) *Boolean { return &Boolean{val: val} }
+                ^
+t1_test.go:31:20: unused-parameter: parameter 't' seems to be unused, consider removing or renaming it as _ (revive)
+func TestCreatePDF(t *testing.T) {
+                   ^
+objects.go:80:17: unused-parameter: parameter 'doc' seems to be unused, consider removing or renaming it as _ (revive)
+func NewInteger(doc *Document, val int) *Integer { return &Integer{val: val} }
+                ^
+dict.go:60:20: empty-block: this block is empty, you can remove it (revive)
+			if AObject > -1 {
+				//if E.Key.FName == "Name" {
+				//	if obj, ok := E.Value.(*TPDFName); ok && obj.FName[0] == 'M' {
+				//		//FIXME: check error 
+				//		NumImg, _ = strconv.Atoi(obj.FName[1:])
+				//		ISize = len(dict.Document.FImages[NumImg].StreamedMask)
+				//		D = dict.Document.GlobalXRefs[AObject].Dict
+				//		addSize( ISize)
+				//		dict.LastElement().Encode(st)
+				//		switch dict.Document.FImages[NumImg].FCompressionMask {
+				//		case icJPEG:
+				//			st.WriteString("/Filter /DCTDecode"+CRLF)
+				//		case icDeflate:
+				//			st.WriteString("/Filter /FlateDecode"+CRLF)
+				//		}
+				//		st.WriteString(">>")
+				//		dict.Document.FImages[NumImg].WriteMaskStream(st)
+				//	} else if obj, ok := E.Value.(*TPDFName); ok && obj.FName[0] == 'I' {
+				//		NumImg, _ = strconv.Atoi(obj.FName[1:])
+				//		ISize = len(dict.Document.FImages[NumImg].StreamedData)
+				//		D = dict.Document.GlobalXRefs[AObject].Dict
+				//		addSize( ISize)
+				//		dict.LastElement().Encode(st)
+				//		switch dict.Document.FImages[NumImg].FCompression {
+				//		case icJPEG:
+				//			st.WriteString("/Filter /DCTDecode"+CRLF)
+				//		case icDeflate:
+				//			st.WriteString("/Filter /FlateDecode"+CRLF)
+				//		}
+				//		st.WriteString(">>")
+				//		dict.Document.FImages[NumImg].WriteImageStream(st)
+				//	}
+				//}
+				// if strings.Contains(E.Key.FName, "Length1") {
+				// 	Value = E.Key.FName
+				// 	pos := strings.Index(Value, " ")
+				// 	NumFnt, _ = strconv.Atoi(Value[pos+1:])
+				// 	if dict.Document.hasOption(poSubsetFont) {
+				// 		var Buf bytes.Buffer 
+						// BufSize = TPDFEmbeddedFont{}.WriteEmbeddedSubsetFont(dict.Document, NumFnt, Buf)
+						// Buf.SetPosition(0)
+						// D = dict.Document.GlobalXRefs[AObject].Dict
+						// addSize( BufSize)
+						// dict.LastElement().Encode(st)
+						// st.WriteString(">>")
+						// Buf.SaveToStream(st)
+					// } else {
+						// M = &TMemoryStream{}
+						// M.LoadFromFile(dict.Document.FontFiles[NumFnt])
+						// Buf = &TMemoryStream{}
+						// BufSize = TPDFEmbeddedFont{}.WriteEmbeddedFont(dict.Document, M, Buf)
+						// Buf.SetPosition(0)
+						// D = dict.Document.GlobalXRefs[AObject].Dict
+						// addSize( BufSize)
+						// dict.LastElement().Encode(st)
+						// st.WriteString(">>")
+						// Buf.SaveToStream(st)
+					// }
+				// }
+			}
+page.go:371:36: empty-block: this block is empty, you can remove it (revive)
+	for i := 1; i < len(APoints); i++ {
+		//FIXME:
+		// p.DrawLine(APoints[i-1].x, APoints[i-1].y, APoints[i].x, APoints[i].y, ALineWidth, false)
+	}
+document.go:232:29: empty-block: this block is empty, you can remove it (revive)
+		if UseUTF16 && !noUnicode {
+			//FIXME:
+			// IDict.AddString(aName, utf8Decode(aValue))
+		} else {
+funcs.go:86:16: unnecessary conversion (unconvert)
+	return float64(cm * (cDefaultDPI / cInchToCM))
+	              ^
+funcs.go:94:16: unnecessary conversion (unconvert)
+	return float64(Inches * cDefaultDPI)
+	              ^
+funcs.go:140:37: unnecessary conversion (unconvert)
+		return strconv.FormatFloat(float64(f), 'f', 0, 32)
+		                                  ^
+color.go:37:2: if statements should only be cuddled with assignments (wsl)
+	if s != c.Document.CurrentColor {
+	^
+color.go:46:2: only one cuddle assignment allowed before if statement (wsl)
+	if stroke {
+	^
+color.go:49:2: return statements should not be cuddled if block has more than two lines (wsl)
+	return lR + " " + lG + " " + lB + " rg"
+	^
+dict.go:53:3: ranges should only be cuddled with assignments used in the iteration (wsl)
+		for _, elem:= range dict.Elements {
+		^
+dict.go:56:3: assignments should only be cuddled with other assignments (wsl)
+		NumImg = -1
+		^
+dict.go:121:3: if statements should only be cuddled with assignments (wsl)
+		if NumImg == -1 && NumFnt == -1 {
+		^
+dict.go:135:2: return statements should not be cuddled if block has more than two lines (wsl)
+	return &dicElement
+	^
+dict.go:176:2: expressions should not be cuddled with blocks (wsl)
+	dict.AddInteger("Count", 1)
+	^
+dict.go:193:2: return statements should not be cuddled if block has more than two lines (wsl)
+	return -1
+	^
+document.go:59:2: assignments should only be cuddled with other assignments (wsl)
+	d.Options = AValue
+	^
+document.go:83:1: block should not end with a whitespace (or comment) (wsl)
+}
+^
+document.go:75:2: if statements should only be cuddled with assignments (wsl)
+	if !doc.hasOption(poNoTrailerID) {
+	^
+document.go:78:2: expressions should not be cuddled with blocks (wsl)
+	doc.CreatePreferencesEntry()
+	^
+document.go:122:2: assignments should only be cuddled with other assignments (wsl)
+	xRefPos := 0
+	^
+document.go:123:2: only one cuddle assignment allowed before for statement (wsl)
+	for i := 1; i < doc.xrefCount(); i++ {
+	^
+document.go:149:2: only one cuddle assignment allowed before if statement (wsl)
+	if X.Stream == nil {
+	^
+document.go:180:2: expressions should not be cuddled with blocks (wsl)
+	st.WriteString(CRLF + "endobj" + CRLF + CRLF)
+	^
+document.go:246:2: only cuddled expressions if assigning variable or using from line above (wsl)
+	doEntry("CreationDate", DateToPdfDate(doc.Infos.CreationDate))
+	^
+document.go:287:2: expressions should not be cuddled with declarations or returns (wsl)
+	buf.Grow(len(ICC_sRGB2014) - 1)
+	^
+document.go:312:2: only cuddled expressions if assigning variable or using from line above (wsl)
+	EDict.AddName("Type", "Pages")
+	^
+document.go:369:2: only one cuddle assignment allowed before if statement (wsl)
+	if s == "" {
+	^
+document.go:759:2: declarations should never be cuddled (wsl)
+	var aDict *Dictionary
+	^
+document.go:760:2: declarations should never be cuddled (wsl)
+	var arr *Array
+	^
+document.go:784:4: if statements should only be cuddled with assignments used in the if statement itself (wsl)
+			if j == 0 && k == 0 {
+			^
+document.go:782:3: only one cuddle assignment allowed before for statement (wsl)
+		for k := 0; k < s.PageCount(); k++ {
+		^
+document.go:802:2: only one cuddle assignment allowed before for statement (wsl)
+	for j := 0; j < doc.Sections.Count(); j++ {
+	^
+document.go:811:2: ranges should only be cuddled with assignments used in the iteration (wsl)
+	for _, font := range doc.Fonts {
+	^
+font_metrics.go:227:2: switch statements should only be cuddled with variables switched (wsl)
+	switch fontname {
+	^
+fonts.go:40:1: block should not end with a whitespace (or comment) (wsl)
+}
+^
+fonts.go:46:1: block should not end with a whitespace (or comment) (wsl)
+}
+^
+fonts.go:144:5: branch statements should not be cuddled if block has more than two lines (wsl)
+				break
+				^
+fonts.go:139:3: only one cuddle assignment allowed before range statement (wsl)
+		for _, mapping := range f.TextMappingList {
+		^
+fonts.go:136:2: only one cuddle assignment allowed before range statement (wsl)
+	for _, char := range AText {
+	^
+funcs.go:148:2: ranges should only be cuddled with assignments used in the iteration (wsl)
+	for _, char := range schar {
+	^
+graphobjs.go:96:2: if statements should only be cuddled with assignments used in the if statement itself (wsl)
+	if t.Stroke {
+	^
+graphobjs.go:379:2: for statements should only be cuddled with assignments used in the iteration (wsl)
+	for i := 1; i < len(s.Points); i++ {
+	^
+page.go:144:2: if statements should only be cuddled with assignments used in the if statement itself (wsl)
+	if !AStroke {
+	^
+text.go:229:2: declarations should never be cuddled (wsl)
+	var result int
+	^
+text.go:230:2: only one cuddle assignment allowed before switch statement (wsl)
+	switch lFontName {
+	^
+text.go:263:2: only cuddled expressions if assigning variable or using from line above (wsl)
+	st.WriteString("BT" + CRLF)
+	^
+text.go:227:1: calculated cyclomatic complexity for function GetTextHeight is 12, max is 10 (cyclop)
+func (t *Text) GetTextHeight() float64 {
+^
+document.go:393:1: Duplicate words (end;) found (dupword)
+//	end;
+^
+text.go:692:1: Duplicate words (st.WriteString("end"+CRLF)) found (dupword)
+// 	st.WriteString("end"+CRLF)
+^
+document.go:788:47: Duplicate words (null) found (dupword)
+				arr.AddItem(NewPDFNameEx(doc, fmt.Sprintf("XYZ null null %f", float64(doc.ZoomValue/100)), false))
+				                                          ^
+funcs.go:169:2: missing cases in switch of type main.UnitOfMeasure: main.uomPixels (exhaustive)
+	switch uofm {
+	^
+dict.go:32:10: Elements is missing in Dictionary (exhaustivestruct)
+	return &Dictionary{Document: aDocument}
+	        ^
+dict.go:237:11: DocObj, Stream are missing in XRef (exhaustivestruct)
+	xref := &XRef{
+	         ^
+document.go:39:10: Catalogue, CurrentColor, CurrentWidth, FontDirectory, FontFiles, Fonts, LineStyleDefs, Pages, Trailer, GlobalXRefs, UnitOfMeasure are missing in Document (exhaustivestruct)
+	doc := &Document{
+	        ^
+fonts.go:19:10: DocObj, SimulateBold, SimulateItalic are missing in EmbeddedFont (exhaustivestruct)
+	return &EmbeddedFont{
+	        ^
+fonts.go:27:10: DocObj is missing in EmbeddedFont (exhaustivestruct)
+	return &EmbeddedFont{
+	        ^
+graphobjs.go:105:17: FPos is missing in MoveTo (exhaustivestruct)
+	st.WriteString(MoveTo{}.CommandXY(X, Y+H2))
+	               ^
+graphobjs.go:106:17: DocObj, Ctrl1, Ctrl2, To, Width, Stroke are missing in CurveC (exhaustivestruct)
+	st.WriteString(CurveC{}.CommandXY(X, Y+H2-HS, X+W2-WS, Y, X+W2, Y))                // was , st)
+	               ^
+graphobjs.go:107:17: DocObj, Ctrl1, Ctrl2, To, Width, Stroke are missing in CurveC (exhaustivestruct)
+	st.WriteString(CurveC{}.CommandXY(X+W2+WS, Y, X+W2*2, Y+H2-HS, X+W2*2, Y+H2))      // was , st)
+	               ^
+graphobjs.go:108:17: DocObj, Ctrl1, Ctrl2, To, Width, Stroke are missing in CurveC (exhaustivestruct)
+	st.WriteString(CurveC{}.CommandXY(X+W2*2, Y+H2+HS, X+W2+WS, Y+H2*2, X+W2, Y+H2*2)) // was , st)
+	               ^
+graphobjs.go:174:10: DocObj is missing in CurveC (exhaustivestruct)
+	return &CurveC{
+	        ^
+graphobjs.go:252:10: DocObj is missing in CurveV (exhaustivestruct)
+	return &CurveV{
+	        ^
+graphobjs.go:271:18: FPos is missing in MoveTo (exhaustivestruct)
+		st.WriteString(MoveTo{}.Command(ls.P1)) // was , st)
+		               ^
+graphobjs.go:288:9: FPos is missing in MoveTo (exhaustivestruct)
+	return MoveTo{}.Command(APos1) + ls.Command(APos2)
+	       ^
+graphobjs.go:400:10: LineMask is missing in LineStyle (exhaustivestruct)
+	return &LineStyle{
+	        ^
+meta.go:17:10: ApplicationName, Author, CreationDate, Title, Keywords are missing in PDFInfo (exhaustivestruct)
+	return &PDFInfo{Producer: ProducerID}
+	        ^
+meta.go:34:58: Sections is missing in SectionList (exhaustivestruct)
+func NewTPDFSectionList() *SectionList         { return &SectionList{} }
+                                                         ^
+meta.go:38:41: Pages is missing in Section (exhaustivestruct)
+	list.Sections = append(list.Sections, &Section{Title: title})
+	                                       ^
+objects.go:40:8: FLineCapStyle is missing in DocObj (exhaustivestruct)
+	do := DocObj{Document: doc}
+	      ^
+objects.go:131:47: FArray is missing in Array (exhaustivestruct)
+func NewArray(doc *Document) *Array { return &Array{DocObj: NewDocObj(doc)} }
+                                              ^
+page.go:20:8: Objects, Orientation, Paper, PaperType, UnitOfMeasure, Matrix, LastFont, LastFontColor are missing in Page (exhaustivestruct)
+	p := &Page{DocObj: NewDocObj(doc)}
+	      ^
+page.go:385:55: DocObj is missing in PopGraphicsStack (exhaustivestruct)
+func (p *Page) PopGraphicsStack()      { p.AddObject(&PopGraphicsStack{}) }
+                                                      ^
+streams.go:25:10: CompressionProhibited, Items are missing in TPDFStream (exhaustivestruct)
+	return &TPDFStream{DocObj: NewDocObj(doc)}
+	        ^
+streams.go:35:8: PDFWriter, buffer are missing in TPDFMemoryStream (exhaustivestruct)
+	ms:= &TPDFMemoryStream{DocObj: NewDocObj(doc)}
+	      ^
+text.go:197:3: Color is missing in BaseText (exhaustivestruct)
+		BaseText{
+		^
+dict.go:173:3: type assertion must be checked (forcetypeassert)
+		dict.Elements[idx].Value.(*Integer).Inc()
+		^
+dict.go:181:3: type assertion must be checked (forcetypeassert)
+		dict.Elements[idx].Value.(*Array).AddItem( kid)
+		^
+document.go:409:5: type assertion must be checked (forcetypeassert)
+				res = res.ElementByName("Font").Value.(*Dictionary)
+				^
+consts.go:169:5: PDFPaperDims is a global variable (gochecknoglobals)
+var PDFPaperDims = map[PaperType][6]int{
+    ^
+consts.go:182:5: PageLayoutNames is a global variable (gochecknoglobals)
+var PageLayoutNames = []string{"SinglePage", "TwoColumnLeft", "OneColumn"}
+    ^
+text.go:17:5: pdfStringReplacer is a global variable (gochecknoglobals)
+var pdfStringReplacer = strings.NewReplacer("\\", "\\\\", "(", "\\(", ")", "\\)")
+    ^
+dict.go:219:9: err113: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"dictionary element not found: %s\", aKey)" (goerr113)
+		panic(fmt.Errorf("dictionary element not found: %s", aKey))
+		      ^
+font_metrics.go:249:13: err113: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(rsErrUnknownStdFont, fontname)" (goerr113)
+		return 0, fmt.Errorf(rsErrUnknownStdFont, fontname)
+		          ^
+color.go:6:30: mnd: Magic number: 0xFF, in <argument> detected (gomnd)
+	return byte((color >> 16) & 0xFF)
+	                            ^
+color.go:10:29: mnd: Magic number: 0xFF, in <argument> detected (gomnd)
+	return byte((color >> 8) & 0xFF)
+	                           ^
+color.go:14:22: mnd: Magic number: 0xFF, in <argument> detected (gomnd)
+	return byte(color & 0xFF)
+	                    ^
+color.go:43:53: mnd: Magic number: 256, in <argument> detected (gomnd)
+	lR := fmt.Sprintf("%f", float64(ARGBGetRed(color))/256)
+	                                                   ^
+color.go:44:55: mnd: Magic number: 256, in <argument> detected (gomnd)
+	lG := fmt.Sprintf("%f", float64(ARGBGetGreen(color))/256)
+	                                                     ^
+color.go:45:54: mnd: Magic number: 256, in <argument> detected (gomnd)
+	lB := fmt.Sprintf("%f", float64(ARGBGetBlue(color))/256)
+	                                                    ^
+document.go:272:32: mnd: Magic number: 3, in <argument> detected (gomnd)
+		Profile.Dict.AddInteger("N", 3)
+		                             ^
+document.go:422:32: mnd: Magic number: 32, in <argument> detected (gomnd)
+	fDict.AddInteger("FirstChar", 32)
+	                              ^
+document.go:423:31: mnd: Magic number: 255, in <argument> detected (gomnd)
+	fDict.AddInteger("LastChar", 255)
+	                             ^
+funcs.go:162:31: mnd: Magic number: 7, in <argument> detected (gomnd)
+		result = strconv.Itoa(int(b&7)) + result
+		                            ^
+graphobjs.go:417:33: mnd: Magic number: 5, in <argument> detected (gomnd)
+			lMask = fmt.Sprintf("%f %f", 5*w, 5*w)
+			                             ^
+graphobjs.go:419:33: mnd: Magic number: 0.8, in <argument> detected (gomnd)
+			lMask = fmt.Sprintf("%f %f", 0.8*w, 4*w)
+			                             ^
+graphobjs.go:421:39: mnd: Magic number: 5, in <argument> detected (gomnd)
+			lMask = fmt.Sprintf("%f %f %f %f", 5*w, 3*w, 0.8*w, 3*w)
+			                                   ^
+graphobjs.go:423:45: mnd: Magic number: 5, in <argument> detected (gomnd)
+			lMask = fmt.Sprintf("%f %f %f %f %f %f", 5*w, 3*w, 0.8*w, 3*w, 0.8*w, 3*w)
+			                                         ^
+page.go:367:20: mnd: Magic number: 2, in <condition> detected (gomnd)
+	if len(APoints) < 2 {
+	                  ^
+document.go:685:7: mnd: Magic number: 2, in <operation> detected (gomnd)
+	i := 2 + 0 // doc.Pages[APageNum].Annots.Count() // + GetTotalAnnotsCount()
+	     ^
+graphobjs.go:101:24: mnd: Magic number: 2, in <operation> detected (gomnd)
+	W2 = t.Dimensions.x / 2
+	                      ^
+graphobjs.go:102:24: mnd: Magic number: 2, in <operation> detected (gomnd)
+	H2 = t.Dimensions.y / 2
+	                      ^
+document.go:45:25: mnd: Magic number: 100, in <assign> detected (gomnd)
+		ZoomValue:            100,
+		                      ^
+document.go:148:2: variable 'X' is only used in the if-statement (document.go:149:2); consider using short syntax (ifshort)
+	X := doc.GlobalXRefs[obj]
+	^
+document.go:891:2: variable 'idx' is only used in the if-statement (document.go:892:2); consider using short syntax (ifshort)
+	idx := d.FindFont(name)
+	^
+writer.go:11:14: interface method WriteString must have named param for type string (inamedparam)
+	WriteString(string)
+	            ^
+writer.go:12:8: interface method Write must have all named params (inamedparam)
+	Write([]byte)
+	      ^
+writer.go:14:12: interface method WriteByte must have named param for type byte (inamedparam)
+	WriteByte(byte)
+	          ^
+dict.go:165:3: return with no blank line before (nlreturn)
+		return
+		^
+dict.go:174:3: return with no blank line before (nlreturn)
+		return
+		^
+dict.go:182:3: return with no blank line before (nlreturn)
+		return
+		^
+funcs.go:190:1: named return "sin" with type "float64" found (nonamedreturns)
+func sincos(a float32) (sin, cost float64) {
+^
+consts.go:186:2: _DegToRad contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	_DegToRad = 0.017453292519943295769236907684886127134428718885417 // N[Pi/180, 50]
+	^
+document.go:120:17: PDF_VERSION contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	st.WriteString(PDF_VERSION + "\n")
+	               ^
+document.go:121:17: PDF_BINARY_BLOB contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	st.WriteString(PDF_BINARY_BLOB + "\n")
+	               ^
+document.go:133:17: PDF_FILE_END contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	st.WriteString(PDF_FILE_END)
+	               ^
+document.go:288:12: ICC_sRGB2014 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	buf.Write(ICC_sRGB2014[1:])
+	          ^
+font_metrics.go:229:12: FONT_TIMES_COURIER_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_COURIER_CAPHEIGHT
+		         ^
+font_metrics.go:231:12: FONT_HELVETICA_ARIAL_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_CAPHEIGHT
+		         ^
+font_metrics.go:233:12: FONT_HELVETICA_ARIAL_BOLD_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_BOLD_CAPHEIGHT
+		         ^
+font_metrics.go:235:12: FONT_HELVETICA_ARIAL_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_ITALIC_CAPHEIGHT
+		         ^
+font_metrics.go:237:12: FONT_HELVETICA_ARIAL_BOLD_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_BOLD_ITALIC_CAPHEIGHT
+		         ^
+font_metrics.go:239:12: FONT_TIMES_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_CAPHEIGHT
+		         ^
+font_metrics.go:241:12: FONT_TIMES_BOLD_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_BOLD_CAPHEIGHT
+		         ^
+font_metrics.go:243:12: FONT_TIMES_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_ITALIC_CAPHEIGHT
+		         ^
+font_metrics.go:245:12: FONT_TIMES_BOLD_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_BOLD_ITALIC_CAPHEIGHT
+		         ^
+font_metrics.go:257:10: FONT_COURIER_FULL contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_COURIER_FULL
+		       ^
+font_metrics.go:259:10: FONT_HELVETICA_ARIAL contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_HELVETICA_ARIAL
+		       ^
+font_metrics.go:261:10: FONT_HELVETICA_ARIAL_BOLD contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_HELVETICA_ARIAL_BOLD
+		       ^
+font_metrics.go:263:10: FONT_HELVETICA_ARIAL_ITALIC contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_HELVETICA_ARIAL_ITALIC
+		       ^
+font_metrics.go:265:10: FONT_HELVETICA_ARIAL_BOLD_ITALIC contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_HELVETICA_ARIAL_BOLD_ITALIC
+		       ^
+font_metrics.go:267:10: FONT_TIMES contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_TIMES
+		       ^
+font_metrics.go:269:10: FONT_TIMES_BOLD contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_TIMES_BOLD
+		       ^
+font_metrics.go:271:10: FONT_TIMES_ITALIC contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_TIMES_ITALIC
+		       ^
+font_metrics.go:273:10: FONT_TIMES_BOLD_ITALIC contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_TIMES_BOLD_ITALIC
+		       ^
+font_metrics.go:275:10: FONT_SYMBOL contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_SYMBOL
+		       ^
+font_metrics.go:277:10: FONT_ZAPFDINGBATS contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		return FONT_ZAPFDINGBATS
+		       ^
+loc.go:18:2: _00 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	_00, _11, _20, _21 float64
+	^
+loc.go:22:20: _00 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	return Coord{x: m._00*point.x + m._20, y: m._11*point.y + m._21}
+	                  ^
+loc.go:26:20: _00 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	return Coord{x: m._00*x + m._20, y: m._11*y + m._21}
+	                  ^
+loc.go:30:31: _20 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	return Coord{x: (point.x - m._20) / m._00, y: (point.y - m._21) / m._11}
+	                             ^
+loc.go:38:4: _11 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	m._11 = value
+	  ^
+loc.go:42:4: _20 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	m._20 = value
+	  ^
+loc.go:46:4: _21 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	m._21 = value
+	  ^
+page.go:31:11: _20 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+	p.Matrix._20 = 0
+	         ^
+page.go:123:12: _11 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		p.Matrix._11 = -1
+		         ^
+page.go:124:12: _21 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		p.Matrix._21 = p.GetPaperHeight()
+		         ^
+page.go:126:12: _11 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		p.Matrix._11 = 1
+		         ^
+page.go:127:12: _21 contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		p.Matrix._21 = 0
+		         ^
+text.go:232:12: FONT_TIMES_COURIER_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_COURIER_CAPHEIGHT
+		         ^
+text.go:234:12: FONT_HELVETICA_ARIAL_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_CAPHEIGHT
+		         ^
+text.go:236:12: FONT_HELVETICA_ARIAL_BOLD_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_BOLD_CAPHEIGHT
+		         ^
+text.go:238:12: FONT_HELVETICA_ARIAL_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_ITALIC_CAPHEIGHT
+		         ^
+text.go:240:12: FONT_HELVETICA_ARIAL_BOLD_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_HELVETICA_ARIAL_BOLD_ITALIC_CAPHEIGHT
+		         ^
+text.go:242:12: FONT_TIMES_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_CAPHEIGHT
+		         ^
+text.go:244:12: FONT_TIMES_BOLD_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_BOLD_CAPHEIGHT
+		         ^
+text.go:246:12: FONT_TIMES_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_ITALIC_CAPHEIGHT
+		         ^
+text.go:248:12: FONT_TIMES_BOLD_ITALIC_CAPHEIGHT contains underscore. You should use mixedCap or MixedCap. (nosnakecase)
+		result = FONT_TIMES_BOLD_ITALIC_CAPHEIGHT
+		         ^
+funcs.go:128:7: SA1019: strings.Title has been deprecated since Go 1.18 and an alternative has been available since Go 1.0: The rule Title uses for word boundaries does not handle Unicode punctuation properly. Use golang.org/x/text/cases instead. (staticcheck)
+	S1 = strings.Title(S1)
+	     ^
+funcs.go:133:8: SA1019: strings.Title has been deprecated since Go 1.18 and an alternative has been available since Go 1.0: The rule Title uses for word boundaries does not handle Unicode punctuation properly. Use golang.org/x/text/cases instead. (staticcheck)
+		S2 = strings.Title(parts[1])
+		     ^
+document.go:890:20: ST1016: methods on the same type should have the same receiver name (seen 29x "doc", 9x "d") (stylecheck)
+func (d *Document) AddFont(name string) int {
+                   ^
+color.go:31:2: variable name 's' is too short for the scope of its usage (varnamelen)
+	s := c.Red + " " + c.Green + " " + c.Blue
+	^
+text.go:196:2: variable name 't' is too short for the scope of its usage (varnamelen)
+	t := &Text{
+	^
+document.go:155:3: variable name 'M' is too short for the scope of its usage (varnamelen)
+		M := NewPDFMemoryStream(doc, nil)
+		^
+fonts.go:137:3: variable name 'c' is too short for the scope of its usage (varnamelen)
+		c := uint16(char)
+		^
+page.go:279:2: variable name 'p1' is too short for the scope of its usage (varnamelen)
+	p1 := p.Matrix.TransformXY(posx, posY)
+	^
+funcs.go:147:6: variable name 's' is too short for the scope of its usage (varnamelen)
+	var s string
+	    ^
+graphobjs.go:95:6: variable name 'X' is too short for the scope of its usage (varnamelen)
+	var X, Y, W2, H2, WS, HS float64
+	    ^
+page.go:314:2: variable name 'p1' is too short for the scope of its usage (varnamelen)
+	p1 := p.Matrix.TransformXY(x, Y)
+	^
+page.go:339:2: variable name 'p1' is too short for the scope of its usage (varnamelen)
+	p1 := p.Matrix.TransformXY(x, Y)
+	^
+fonts.go:55:2: variable name 'PS' is too short for the scope of its usage (varnamelen)
+	PS := st.Offset()
+	^
+page.go:346:6: variable name 'R' is too short for the scope of its usage (varnamelen)
+	var R *RoundedRectangle
+	    ^
+t1_test.go:49:2: variable name 'pg' is too short for the scope of its usage (varnamelen)
+	pg := sec.Pages[0]
+	^
+document.go:775:3: variable name 's' is too short for the scope of its usage (varnamelen)
+		s := doc.Sections.Get(j)
+		^
+document.go:157:3: variable name 'd' is too short for the scope of its usage (varnamelen)
+		d := M.Size()
+		^
+graphobjs.go:430:2: variable name 'ls' is too short for the scope of its usage (varnamelen)
+	ls := NewPDFLineStyle(document, ppsSolid, phase, lineWidth)
+	^
+funcs.go:129:2: variable name 'S2' is too short for the scope of its usage (varnamelen)
+	S2 := ""
+	^
+page.go:319:6: variable name 'R' is too short for the scope of its usage (varnamelen)
+	var R *Rectangle
+	    ^
+document.go:327:2: variable name 'pp' is too short for the scope of its usage (varnamelen)
+	pp := doc.Pages[pageNum]
+	^
+funcs.go:127:2: variable name 'S1' is too short for the scope of its usage (varnamelen)
+	S1 := strings.Split(AValue, ":")[1]
+	^
+graphobjs.go:192:25: parameter name 'st' is too short for the scope of its usage (varnamelen)
+func (t *CurveY) Encode(st PDFWriter) {
+                        ^
+objects.go:111:26: parameter name 'st' is too short for the scope of its usage (varnamelen)
+func (n *PDFName) Encode(st PDFWriter) {
+                         ^
+graphobjs.go:94:26: parameter name 'st' is too short for the scope of its usage (varnamelen)
+func (t *Ellipse) Encode(st PDFWriter) {
+                         ^
+text.go:194:34: parameter name 'y' is too short for the scope of its usage (varnamelen)
+func NewText(document *Document, x, y float64, txt string, font *EmbeddedFont,
+                                 ^
+page.go:264:42: parameter name 'p1' is too short for the scope of its usage (varnamelen)
+func (p *Page) addAngle(degrees float32, p1 Coord) {
+                                         ^
+document.go:140:10: error returned from external package is unwrapped: sig: func os.Create(name string) (*os.File, error) (wrapcheck)
+		return err
+		       ^

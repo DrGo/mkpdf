@@ -1,6 +1,7 @@
 package main
 
 import "fmt"
+
 func ARGBGetRed(color ARGBColor) byte {
 	return byte((color >> 16) & 0xFF)
 }
@@ -17,8 +18,8 @@ func ARGBGetAlpha(color ARGBColor) byte {
 	return byte((color >> 24) & 0xFF)
 }
 
-type TPDFColor struct {
-	TPDFDocumentObject
+type Color struct {
+	DocObj
 	Color  ARGBColor
 	Red    string
 	Green  string
@@ -26,7 +27,7 @@ type TPDFColor struct {
 	Stroke bool
 }
 
-func (c *TPDFColor) Write(stream PDFWriter) {
+func (c *Color) Write(stream PDFWriter) {
 	s := c.Red + " " + c.Green + " " + c.Blue
 	if c.Stroke {
 		s += " RG"
@@ -34,31 +35,33 @@ func (c *TPDFColor) Write(stream PDFWriter) {
 		s += " rg"
 	}
 	if s != c.Document.CurrentColor {
-		stream.WriteString(s+CRLF)
+		stream.WriteString(s + CRLF)
 		c.Document.CurrentColor = s
 	}
 }
-func TPDFColorCommand(stroke bool, color ARGBColor) string {
-	lR := fmt.Sprintf("%f", PDFFloat(ARGBGetRed(color))/256)
-	lG := fmt.Sprintf("%f", PDFFloat(ARGBGetGreen(color))/256)
-	lB := fmt.Sprintf("%f", PDFFloat(ARGBGetBlue(color))/256)
+func ColorCommand(stroke bool, color ARGBColor) string {
+	lR := fmt.Sprintf("%f", float64(ARGBGetRed(color))/256)
+	lG := fmt.Sprintf("%f", float64(ARGBGetGreen(color))/256)
+	lB := fmt.Sprintf("%f", float64(ARGBGetBlue(color))/256)
 	if stroke {
 		return lR + " " + lG + " " + lB + " RG"
 	}
 	return lR + " " + lG + " " + lB + " rg"
 }
 
-func NewTPDFColor(document *TPDFDocument, color ARGBColor, stroke bool) *TPDFColor {
-	return &TPDFColor{
-		TPDFDocumentObject: NewTPDFDocumentObject(document),
-		Color:       color,
-		Red:         fmt.Sprintf("%f", PDFFloat(ARGBGetRed(color))/256),
-		Green:       fmt.Sprintf("%f", PDFFloat(ARGBGetGreen(color))/256),
-		Blue:        fmt.Sprintf("%f", PDFFloat(ARGBGetBlue(color))/256),
-		Stroke:      stroke,
+func NewColor(document *Document, color ARGBColor, stroke bool) *Color {
+	return &Color{
+		DocObj: NewDocObj(document),
+		Color:  color,
+		Red:    fmt.Sprintf("%f", float64(ARGBGetRed(color))/256),
+		Green:  fmt.Sprintf("%f", float64(ARGBGetGreen(color))/256),
+		Blue:   fmt.Sprintf("%f", float64(ARGBGetBlue(color))/256),
+		Stroke: stroke,
 	}
 }
 
+// FIXME:
+func (c *Color) Encode(st PDFWriter) {}
 
 var ICC_sRGB2014 = [3024]byte{
 	0x00, 0x00, 0x0B, 0xD0, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x6D, 0x6E, 0x74, 0x72, 0x52, 0x47, 0x42, 0x20, 0x58, 0x59, 0x5A, 0x20, 0x07, 0xDF, 0x00, 0x02, 0x00, 0x0F, 0x00, 0x00,

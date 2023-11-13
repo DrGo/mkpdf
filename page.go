@@ -2,45 +2,49 @@ package main
 
 import "fmt"
 
-type TPDFPage struct {
-	TPDFDocumentObject
+type Page struct {
+	DocObj
 	Objects       []Encoder
-	Orientation   TPDFPaperOrientation
-	Paper         TPDFPaper
-	PaperType     TPDFPaperType
-	UnitOfMeasure TPDFUnitOfMeasure
-	Matrix        TPDFMatrix
+	Orientation   PaperOrientation
+	Paper         Paper
+	PaperType     PaperType
+	UnitOfMeasure UnitOfMeasure
+	Matrix        Matrix
 	//FIXME: re-enable
 	// Annots            TPDFAnnotList
-	LastFont      *TPDFEmbeddedFont
+	LastFont      *EmbeddedFont
 	LastFontColor ARGBColor
 }
 
-func NewTPDFPage(ADocument *TPDFDocument) *TPDFPage {
-	p := &TPDFPage{TPDFDocumentObject: NewTPDFDocumentObject(ADocument)}
-	if ADocument != nil {
-		p.PaperType = ADocument.DefaultPaperType
-		p.Orientation = ADocument.DefaultOrientation
-		p.UnitOfMeasure = ADocument.DefaultUnitOfMeasure
+func NewPage(doc *Document) *Page {
+	p := &Page{DocObj: NewDocObj(doc)}
+	if doc != nil {
+		p.PaperType = doc.DefaultPaperType
+		p.Orientation = doc.DefaultOrientation
+		p.UnitOfMeasure = doc.DefaultUnitOfMeasure
 	} else {
 		p.PaperType = ptA4
-		p.CalcPaperSize()
 		p.UnitOfMeasure = uomMillimeters
 	}
+	p.CalcPaperSize()
 	p.Matrix._00 = 1
 	p.Matrix._20 = 0
 	p.AdjustMatrix()
 	// p.Annots = p.CreateAnnotList()
 	return p
 }
-func (p *TPDFPage) AddObject(AObject Encoder) {
-	p.Objects = append(p.Objects, AObject)
+
+// FIXME:
+func (p *Page) Encode(st PDFWriter) {}
+
+func (p *Page) AddObject(obj Encoder) {
+	p.Objects = append(p.Objects, obj)
 }
-func (p *TPDFPage) GetO(AIndex int) Encoder {
+func (p *Page) GetObject(AIndex int) Encoder {
 	return p.Objects[AIndex]
 }
 
-func (p *TPDFPage) GetObjectCount() int {
+func (p *Page) GetObjectCount() int {
 	return len(p.Objects)
 }
 
@@ -48,25 +52,25 @@ func (p *TPDFPage) GetObjectCount() int {
 // 	return NewTPDFAnnotList(p.FDocument)
 // }
 
-func (p *TPDFPage) SetOrientation(AValue TPDFPaperOrientation) {
-	if p.Orientation == AValue {
+func (p *Page) SetOrientation(val PaperOrientation) {
+	if p.Orientation == val {
 		return
 	}
-	p.Orientation = AValue
+	p.Orientation = val
 	p.CalcPaperSize()
 	p.AdjustMatrix()
 }
 
-func (p *TPDFPage) SetPaper(AValue TPDFPaper) {
-	if p.Paper == AValue {
+func (p *Page) SetPaper(val Paper) {
+	if p.Paper == val {
 		return
 	}
-	p.Paper = AValue
+	p.Paper = val
 	p.PaperType = ptCustom
 	p.AdjustMatrix()
 }
 
-func (p *TPDFPage) CalcPaperSize() {
+func (p *Page) CalcPaperSize() {
 	if p.PaperType == ptCustom {
 		return
 	}
@@ -74,30 +78,30 @@ func (p *TPDFPage) CalcPaperSize() {
 	if p.Orientation == ppoLandscape {
 		O1, O2 = 1, 0
 	}
-	p.Paper = TPDFPaper{
+	p.Paper = Paper{
 		H: PDFPaperDims[p.PaperType][O1],
 		W: PDFPaperDims[p.PaperType][O2],
-		Printable: TPDFDimensions{
-			T: PDFPaperDims[p.PaperType][2+O1],
-			L: PDFPaperDims[p.PaperType][2+O2],
-			R: PDFPaperDims[p.PaperType][2+2+O1],
-			B: PDFPaperDims[p.PaperType][2+2+O2],
+		Printable: Dimensions{
+			T: float64(PDFPaperDims[p.PaperType][2+O1]),
+			L: float64(PDFPaperDims[p.PaperType][2+O2]),
+			R: float64(PDFPaperDims[p.PaperType][2+2+O1]),
+			B: float64(PDFPaperDims[p.PaperType][2+2+O2]),
 		},
 	}
 }
 
-func (p *TPDFPage) SetPaperType(AValue TPDFPaperType) {
-	if p.PaperType == AValue {
+func (p *Page) SetPaperType(val PaperType) {
+	if p.PaperType == val {
 		return
 	}
-	p.PaperType = AValue
+	p.PaperType = val
 	if p.PaperType != ptCustom {
 		p.CalcPaperSize()
 	}
 	p.AdjustMatrix()
 }
 
-func (p *TPDFPage) AddTextToLookupLists(AText string) {
+func (p *Page) AddTextToLookupLists(AText string) {
 	//FIXME:
 	// if AText == "" {
 	// 	return
@@ -106,15 +110,15 @@ func (p *TPDFPage) AddTextToLookupLists(AText string) {
 	// p.FDocument.Fonts[p.FLastFont.FontIndex].AddTextToMappingList(str)
 }
 
-func (p *TPDFPage) SetUnitOfMeasure(AValue TPDFUnitOfMeasure) {
-	if p.UnitOfMeasure == AValue {
+func (p *Page) SetUnitOfMeasure(val UnitOfMeasure) {
+	if p.UnitOfMeasure == val {
 		return
 	}
-	p.UnitOfMeasure = AValue
+	p.UnitOfMeasure = val
 	p.AdjustMatrix()
 }
 
-func (p *TPDFPage) AdjustMatrix() {
+func (p *Page) AdjustMatrix() {
 	if p.Document.hasOption(poPageOriginAtTop) {
 		p.Matrix._11 = -1
 		p.Matrix._21 = p.GetPaperHeight()
@@ -124,17 +128,19 @@ func (p *TPDFPage) AdjustMatrix() {
 	}
 }
 
-func (p *TPDFPage) DoUnitConversion(coord *TPDFCoord) {
-	DoUnitConversion(coord, p.UnitOfMeasure)
+func (p *Page) DoUnitConversion(coord *Coord) { DoUnitConversion(coord, p.UnitOfMeasure) }
+
+func (p *Page) SetFont(fontIdx int, fontSz float64) {
+	p.SetFontEx(fontIdx, fontSz, false, false)
 }
 
-func (p *TPDFPage) SetFont(AFontIndex int, AFontSize PDFFloat, ASimulateBold, ASimulateItalic bool) {
-	p.LastFont = p.Document.CreateEmbeddedFont(p, AFontIndex, AFontSize, ASimulateBold, ASimulateItalic)
+func (p *Page) SetFontEx(fontIdx int, fontSz float64, ASimulateBold, ASimulateItalic bool) {
+	p.LastFont = p.Document.CreateEmbeddedFont(p, fontIdx, fontSz, ASimulateBold, ASimulateItalic)
 	p.AddObject(p.LastFont)
 }
 
-func (p *TPDFPage) SetColor(AColor ARGBColor, AStroke bool) {
-	C := NewTPDFColor(p.Document, AColor, AStroke)
+func (p *Page) SetColor(AColor ARGBColor, AStroke bool) {
+	C := NewColor(p.Document, AColor, AStroke)
 	if !AStroke {
 		p.LastFontColor = AColor
 	}
@@ -142,12 +148,12 @@ func (p *TPDFPage) SetColor(AColor ARGBColor, AStroke bool) {
 }
 
 //FIXME:
-// func (p *TPDFPage) SetPenStyle(AStyle TPDFPenStyle, ALineWidth PDFFloat) {
+// func (p *TPDFPage) SetPenStyle(AStyle TPDFPenStyle, ALineWidth float64) {
 // 	L := p.Document.CreateLineStyle(AStyle, ALineWidth)
 // 	p.AddObject(L)
 // }
 
-// func (p *TPDFPage) SetPenStyle(ADashArray TDashArray, ALineWidth PDFFloat) {
+// func (p *TPDFPage) SetPenStyle(ADashArray TDashArray, ALineWidth float64) {
 // 	L := p.Document.CreateLineStyleFromDashArray(ADashArray, ALineWidth)
 // 	p.AddObject(L)
 // }
@@ -163,7 +169,7 @@ func (p *TPDFPage) SetColor(AColor ARGBColor, AStroke bool) {
 // 	p.AddObject(J)
 // }
 
-// // func (p *TPDFPage) SetMiterLimit(AMiterLimit PDFFloat) {
+// // func (p *TPDFPage) SetMiterLimit(AMiterLimit float64) {
 // // 	M := p.Document.CreateMiterLimit(AMiterLimit)
 // // 	p.AddObject(M)
 // // }
@@ -206,34 +212,34 @@ func (p *TPDFPage) SetColor(AColor ARGBColor, AStroke bool) {
 // 	}
 // }
 
-// func (p *TPDFPage) DrawImageRawSize(x, Y PDFFloat, APixelWidth, APixelHeight, ANumber int, ADegrees float32) {
+// func (p *TPDFPage) DrawImageRawSize(x, Y float64, APixelWidth, APixelHeight, ANumber int, degs float64) {
 // 	p1 := p.Matrix.TransformXY(x, Y)
 // 	p.DoUnitConversion(&p1)
 
-// 	if ADegrees != 0.0 {
+// 	if degs != 0.0 {
 // p.AddObject(NewPDFFreeFormString(p.Document, fmt.Sprintf("%s %s %s %s %.4f %.4f cm", t1, t2, t3, t1, p1.x, p1.y)))
 // 		p.AddObject(p.FDocument.CreateImage(0, 0, APixelWidth, APixelHeight, ANumber))
 // 	} else {
 // 		p.AddObject(p.FDocument.CreateImage(p1.x, p1.y, APixelWidth, APixelHeight, ANumber))
 // 	}
 
-// 	if ADegrees != 0.0 {
+// 	if degs != 0.0 {
 // 		p.AddObject(NewTPDFPopGraphicsStack(p.FDocument))
 // 	}
 // }
 
-// func (p *TPDFPage) DrawImageRawSizePos(APos TPDFCoord, APixelWidth, APixelHeight, ANumber int, ADegrees float32) {
-// 	p.DrawImageRawSize(APos.x, APos.y, APixelWidth, APixelHeight, ANumber, ADegrees)
+// func (p *TPDFPage) DrawImageRawSizePos(pos TPDFCoord, APixelWidth, APixelHeight, ANumber int, degs float64) {
+// 	p.DrawImageRawSize(pos.x, pos.y, APixelWidth, APixelHeight, ANumber, degs)
 // }
 
-// func (p *TPDFPage) DrawImage(x, Y, AWidth, AHeight PDFFloat, ANumber int, ADegrees float32) {
+// func (p *TPDFPage) DrawImage(x, Y, AWidth, AHeight float64, ANumber int, degs float64) {
 // 	p1 := p.Matrix.TransformXY(x, Y)
 // 	p.DoUnitConversion(&p1)
 // 	p2 := TPDFCoord{AWidth, AHeight}
 // 	p.DoUnitConversion(&p2)
 
-// 	if ADegrees != 0.0 {
-// 		rad := DegToRad(-ADegrees)
+// 	if degs != 0.0 {
+// 		rad := DegToRad(-degs)
 // 		rads, radc := sincos(rad)
 // 		t1 := fmt.Sprintf(PDF_NUMBER_MASK, radc)
 // 		t2 := fmt.Sprintf(PDF_NUMBER_MASK, -rads)
@@ -246,118 +252,118 @@ func (p *TPDFPage) SetColor(AColor ARGBColor, AStroke bool) {
 // 		p.AddObject(p.FDocument.CreateImage(p1.x, p1.y, p2.x, p2.y, ANumber))
 // 	}
 
-// 	if ADegrees != 0.0 {
+// 	if degs != 0.0 {
 // 		p.AddObject(NewTPDFPopGraphicsStack(p.FDocument))
 // 	}
 // }
 
-// func (p *TPDFPage) DrawImagePos(APos TPDFCoord, AWidth, AHeight PDFFloat, ANumber int, ADegrees float32) {
-// 	p.DrawImage(APos.x, APos.y, AWidth, AHeight, ANumber, ADegrees)
+// func (p *TPDFPage) DrawImagePos(pos TPDFCoord, AWidth, AHeight float64, ANumber int, degs float64) {
+// 	p.DrawImage(pos.x, pos.y, AWidth, AHeight, ANumber, degs)
 // }
 
-func (p *TPDFPage) addAngle(degrees float32, p1 TPDFCoord) {
+func (p *Page) addAngle(degrees float64, p1 Coord) {
 	rad := DegToRad(-degrees)
 	rads, radc := sincos(rad)
 	//FIXME: is per-local formatting needed
 	// t1 := fmt.Sprintf(PDF_NUMBER_MASK, radc)
 	// t2 := fmt.Sprintf(PDF_NUMBER_MASK, -rads)
 	// t3 := fmt.Sprintf(PDF_NUMBER_MASK, rads)
-	p.AddObject(&TPDFPushGraphicsStack{})
+	p.AddObject(&PushGraphicsStack{})
 	//FIXME: this when per-local formatting was used (using tn ); I replaced
 	// it with simple %0.4f
 	// p.AddObject(NewTPDFFreeFormString(p.Document, fmt.Sprintf("%s %s %s %s %.4f %.4f cm", t1, t2, t3, t1, p1.x, p1.y)))
-	p.AddObject(NewTPDFFreeFormString(p.Document, fmt.Sprintf("%.4f %.4f %.4f %.4f %.4f %.4f cm", radc, -rads, rads, radc, p1.x, p1.y)))
+	p.AddObject(NewFreeFormString(p.Document, fmt.Sprintf("%.4f %.4f %.4f %.4f %.4f %.4f cm", radc, -rads, rads, radc, p1.x, p1.y)))
 }
 
-func (p *TPDFPage) DrawEllipse(APosx, APosY, AWidth, AHeight, ALineWidth PDFFloat, AFill, AStroke bool, ADegrees float32) {
-	p1 := p.Matrix.TransformXY(APosx, APosY)
+func (p *Page) DrawEllipse(posx, posY, AWidth, AHeight, ALineWidth float64, AFill, AStroke bool, degs float64) {
+	p1 := p.Matrix.TransformXY(posx, posY)
 	p.DoUnitConversion(&p1)
-	p2 := TPDFCoord{AWidth, AHeight}
+	p2 := Coord{AWidth, AHeight}
 	p.DoUnitConversion(&p2)
 
-	if ADegrees != 0.0 {
-		p.addAngle(ADegrees, p1)
-		p.AddObject(NewTPDFEllipse(p.Document, 0, 0, p2.x, p2.y, ALineWidth, AFill, AStroke))
+	if degs != 0.0 {
+		p.addAngle(degs, p1)
+		p.AddObject(NewEllipse(p.Document, 0, 0, p2.x, p2.y, ALineWidth, AFill, AStroke))
 	} else {
-		p.AddObject(NewTPDFEllipse(p.Document, p1.x, p1.y, p2.x, p2.y, ALineWidth, AFill, AStroke))
+		p.AddObject(NewEllipse(p.Document, p1.x, p1.y, p2.x, p2.y, ALineWidth, AFill, AStroke))
 	}
 
-	if ADegrees != 0.0 {
+	if degs != 0.0 {
 		p.AddObject(NewTPDFPopGraphicsStack(p.Document))
 	}
 }
 
-func (p *TPDFPage) DrawEllipsePos(APos TPDFCoord, AWidth, AHeight, ALineWidth PDFFloat, AFill, AStroke bool, ADegrees float32) {
-	p.DrawEllipse(APos.x, APos.y, AWidth, AHeight, ALineWidth, AFill, AStroke, ADegrees)
+func (p *Page) DrawEllipsePos(pos Coord, AWidth, AHeight, ALineWidth float64, AFill, AStroke bool, degs float64) {
+	p.DrawEllipse(pos.x, pos.y, AWidth, AHeight, ALineWidth, AFill, AStroke, degs)
 }
 
-// func (p *TPDFPage) DrawLine(APos1, APos2 PDFCoord, ALineWidth PDFFloat, AStroke bool) {
-// 	p.DrawLine(APos1.x, APos1.y, APos2.x, APos2.y, ALineWidth, AStroke)
+// func (p *TPDFPage) DrawLine(pos1, pos2 PDFCoord, ALineWidth float64, AStroke bool) {
+// 	p.DrawLine(pos1.x, pos1.y, pos2.x, pos2.y, ALineWidth, AStroke)
 // }
 
-// func (p *TPDFPage) DrawLineStyle(X1, Y1, X2, Y2 PDFFloat, AStyle int) {
+// func (p *TPDFPage) DrawLineStyle(X1, Y1, X2, Y2 float64, AStyle int) {
 // 	S := p.Document.LineStyles[AStyle]
 // 	p.SetLineStyle(S)
 // 	p.DrawLine(X1, Y1, X2, Y2, S.LineWidth)
 // }
 
-//	func (p *TPDFPage) DrawLineStyleCoord(APos1, APos2 PDFCoord, AStyle int) {
-//		p.DrawLineStyle(APos1.x, APos1.y, APos2.x, APos2.y, AStyle)
+//	func (p *TPDFPage) DrawLineStyleCoord(pos1, pos2 PDFCoord, AStyle int) {
+//		p.DrawLineStyle(pos1.x, pos1.y, pos2.x, pos2.y, AStyle)
 //	}
-func (p *TPDFPage) DrawRect(x, Y, W, H, ALineWidth PDFFloat, AFill, AStroke bool, ADegrees float32) {
+func (p *Page) DrawRect(x, Y, W, H, ALineWidth float64, AFill, AStroke bool, degs float64) {
 	p1 := p.Matrix.TransformXY(x, Y)
 	p.DoUnitConversion(&p1)
-	p2 := TPDFCoord{x: W, y: H}
+	p2 := Coord{x: W, y: H}
 	p.DoUnitConversion(&p2)
 
-	var R *TPDFRectangle
-	if ADegrees != 0.0 {
-		p.addAngle(ADegrees, p1)
-		R = NewTPDFRectangle(p.Document, 0, 0, p2.x, p2.y, ALineWidth, AFill, AStroke)
+	var R *Rectangle
+	if degs != 0.0 {
+		p.addAngle(degs, p1)
+		R = NewRectangle(p.Document, 0, 0, p2.x, p2.y, ALineWidth, AFill, AStroke)
 	} else {
-		R = NewTPDFRectangle(p.Document, p1.x, p1.y, p2.x, p2.y, ALineWidth, AFill, AStroke)
+		R = NewRectangle(p.Document, p1.x, p1.y, p2.x, p2.y, ALineWidth, AFill, AStroke)
 	}
 
 	p.AddObject(R)
 
-	if ADegrees != 0.0 {
+	if degs != 0.0 {
 		p.AddObject(NewTPDFPopGraphicsStack(p.Document))
 	}
 }
 
-func (p *TPDFPage) DrawRectCoord(APos TPDFCoord, W, H, ALineWidth PDFFloat, AFill, AStroke bool, ADegrees float32) {
-	p.DrawRect(APos.x, APos.y, W, H, ALineWidth, AFill, AStroke, ADegrees)
+func (p *Page) DrawRectCoord(pos Coord, W, H, ALineWidth float64, AFill, AStroke bool, degs float64) {
+	p.DrawRect(pos.x, pos.y, W, H, ALineWidth, AFill, AStroke, degs)
 }
 
-func (p *TPDFPage) DrawRoundedRect(x, Y, W, H, ARadius, ALineWidth PDFFloat, AFill, AStroke bool, ADegrees float32) {
+func (p *Page) DrawRoundedRect(x, Y, W, H, ARadius, ALineWidth float64, AFill, AStroke bool, degs float64) {
 	p1 := p.Matrix.TransformXY(x, Y)
 	p.DoUnitConversion(&p1)
-	p2 := TPDFCoord{x: W, y: H}
+	p2 := Coord{x: W, y: H}
 	p.DoUnitConversion(&p2)
-	p3 := TPDFCoord{x: ARadius}
+	p3 := Coord{x: ARadius}
 	p.DoUnitConversion(&p3)
 
-	var R *PDFRoundedRectangle
-	if ADegrees != 0.0 {
-		p.addAngle(ADegrees, p1)
-		R = NewPDFRoundedRectangle(p.Document, 0, 0, p2.x, p2.y, p3.x, ALineWidth, AFill, AStroke)
+	var R *RoundedRectangle
+	if degs != 0.0 {
+		p.addAngle(degs, p1)
+		R = NewRoundedRectangle(p.Document, 0, 0, p2.x, p2.y, p3.x, ALineWidth, AFill, AStroke)
 	} else {
-		R = NewPDFRoundedRectangle(p.Document, p1.x, p1.y, p2.x, p2.y, p3.x, ALineWidth, AFill, AStroke)
+		R = NewRoundedRectangle(p.Document, p1.x, p1.y, p2.x, p2.y, p3.x, ALineWidth, AFill, AStroke)
 	}
 
 	p.AddObject(R)
 
-	if ADegrees != 0.0 {
+	if degs != 0.0 {
 		p.AddObject(NewTPDFPopGraphicsStack(p.Document))
 	}
 }
 
-func (p *TPDFPage) DrawPolygon(APoints []TPDFCoord, ALineWidth PDFFloat) {
+func (p *Page) DrawPolygon(APoints []Coord, ALineWidth float64) {
 	p.DrawPolyLine(APoints, ALineWidth)
 	p.ClosePath()
 }
 
-func (p *TPDFPage) DrawPolyLine(APoints []TPDFCoord, ALineWidth PDFFloat) {
+func (p *Page) DrawPolyLine(APoints []Coord, ALineWidth float64) {
 	if len(APoints) < 2 {
 		return
 	}
@@ -368,61 +374,33 @@ func (p *TPDFPage) DrawPolyLine(APoints []TPDFCoord, ALineWidth PDFFloat) {
 	}
 }
 
-func (p *TPDFPage) ResetPath() {
-	p.AddObject(&TPDFResetPath{})
-}
+func (p *Page) ResetPath()             { p.AddObject(&ResetPath{}) }
+func (p *Page) ClipPath()              { p.AddObject(&ClipPath{}) }
+func (p *Page) ClosePath()             { p.AddObject(&ClosePath{}) }
+func (p *Page) StrokePath()            { p.AddObject(&StrokePath{}) }
+func (p *Page) ClosePathStroke()       { p.AddObject(NewFreeFormString(p.Document, "s\n")) }
+func (p *Page) FillStrokePath()        { p.AddObject(NewFreeFormString(p.Document, "B\n")) }
+func (p *Page) FillEvenOddStrokePath() { p.AddObject(NewFreeFormString(p.Document, "B*\n")) }
+func (p *Page) PushGraphicsStack()     { p.AddObject(&PushGraphicsStack{}) }
+func (p *Page) PopGraphicsStack()      { p.AddObject(&PopGraphicsStack{}) }
+func (p *Page) MoveToPoint(pos Coord)  { p.MoveTo(pos.x, pos.y) }
 
-func (p *TPDFPage) ClipPath() {
-	p.AddObject(&TPDFClipPath{})
-}
-
-func (p *TPDFPage) ClosePath() {
-	p.AddObject(&TPDFClosePath{})
-}
-
-func (p *TPDFPage) StrokePath() {
-	p.AddObject(&TPDFStrokePath{})
-}
-func (p *TPDFPage) ClosePathStroke() {
-	p.AddObject(NewTPDFFreeFormString(p.Document, "s\n"))
-}
-
-func (p *TPDFPage) FillStrokePath() {
-	p.AddObject(NewTPDFFreeFormString(p.Document, "B\n"))
-}
-
-func (p *TPDFPage) FillEvenOddStrokePath() {
-	p.AddObject(NewTPDFFreeFormString(p.Document, "B*\n"))
-}
-
-func (p *TPDFPage) PushGraphicsStack() {
-	p.AddObject(&TPDFPushGraphicsStack{})
-}
-
-func (p *TPDFPage) PopGraphicsStack() {
-	p.AddObject(&TPDFPopGraphicsStack{})
-}
-
-func (p *TPDFPage) MoveTo(x, y PDFFloat) {
+func (p *Page) MoveTo(x, y float64) {
 	p1 := p.Matrix.TransformXY(x, y)
 	DoUnitConversion(&p1, p.UnitOfMeasure)
-	p.AddObject(&TPDFMoveTo{p1})
+	p.AddObject(&MoveTo{p1})
 }
 
-func (p *TPDFPage) MoveToPoint(pos TPDFCoord) {
-	p.MoveTo(pos.x, pos.y)
-}
-
-func (p *TPDFPage) GetPaperHeight() PDFFloat {
+func (p *Page) GetPaperHeight() float64 {
 	switch p.UnitOfMeasure {
 	case uomMillimeters:
-		return PDFTomm(PDFFloat(p.Paper.H))
+		return PDFTomm(float64(p.Paper.H))
 	case uomCentimeters:
-		return PDFtoCM(PDFFloat(p.Paper.H))
+		return PDFtoCM(float64(p.Paper.H))
 	case uomInches:
-		return PDFtoInches(PDFFloat(p.Paper.H))
+		return PDFtoInches(float64(p.Paper.H))
 	case uomPixels:
-		return PDFFloat(p.Paper.H)
+		return float64(p.Paper.H)
 	default:
 		return 0
 	}
@@ -437,17 +415,17 @@ func (p *TPDFPage) GetPaperHeight() PDFFloat {
 // 	return false
 // }
 
-func (p *TPDFPage) CreateStdFontText(x, Y PDFFloat, AText string, AFont *TPDFEmbeddedFont, ADegrees float32, AUnderline, AStrikethrough bool) {
-	p.AddObject(NewTPDFText(p.Document, x, Y, AText, AFont, ADegrees, AUnderline, AStrikethrough))
+func (p *Page) CreateStdFontText(x, Y float64, AText string, AFont *EmbeddedFont, degs float64, AUnderline, AStrikethrough bool) {
+	p.AddObject(NewText(p.Document, x, Y, AText, AFont, degs, AUnderline, AStrikethrough))
 }
 
-// func (p *TPDFPage) CreateTTFFontText(x, Y PDFFloat, AText string, AFont *TPDFEmbeddedFont, ADegrees float32, AUnderline, AStrikethrough bool) {
+// func (p *TPDFPage) CreateTTFFontText(x, Y float64, AText string, AFont *TPDFEmbeddedFont, degs float64, AUnderline, AStrikethrough bool) {
 // 	p.AddTextToLookupLists(AText)
-// 	T := p.Document.CreateText(x, Y, AText, AFont, ADegrees, AUnderline, AStrikethrough)
+// 	T := p.Document.CreateText(x, Y, AText, AFont, degs, AUnderline, AStrikethrough)
 // 	p.AddObject(T)
 // }
 
-// procedure TPDFPage.WriteText(X, Y: TPDFFloat; AText: UTF8String; const ADegrees: single;
+// procedure TPDFPage.WriteText(X, Y: Tfloat64; AText: UTF8String; const degs: single;
 //     const AUnderline: boolean; const AStrikethrough: boolean);
 // var
 //   p: TPDFCoord;
@@ -457,27 +435,27 @@ func (p *TPDFPage) CreateStdFontText(x, Y PDFFloat, AText string, AFont *TPDFEmb
 //   p := Matrix.Transform(X, Y);
 //   DoUnitConversion(p);
 //   if Document.Fonts[FLastFont.FontIndex].IsStdFont then
-//     CreateStdFontText(p.X, p.Y, AText, FLastFont, ADegrees, AUnderline, AStrikeThrough)
+//     CreateStdFontText(p.X, p.Y, AText, FLastFont, degs, AUnderline, AStrikeThrough)
 //   else
-//     CreateTTFFontText(p.X, p.Y, AText, FLastFont, ADegrees, AUnderline, AStrikeThrough);
+//     CreateTTFFontText(p.X, p.Y, AText, FLastFont, degs, AUnderline, AStrikeThrough);
 // end;
 
-// procedure TPDFPage.WriteText(APos: TPDFCoord; AText: UTF8String; const ADegrees: single;
+// procedure TPDFPage.WriteText(pos: TPDFCoord; AText: UTF8String; const degs: single;
 //
 //	const AUnderline: boolean; const AStrikethrough: boolean);
 //
 // begin
 //
-//	WriteText(APos.X, APos.Y, AText, ADegrees, AUnderline, AStrikeThrough);
+//	WriteText(pos.X, pos.Y, AText, degs, AUnderline, AStrikeThrough);
 //
 // end;
 // FIXME: complete implementation
-func (p *TPDFPage) WriteTextEx(x, y PDFFloat, txt string, ADegrees float32, underline, strikethro bool) {
+func (p *Page) WriteTextEx(x, y float64, txt string, degs float64, underline, strikethro bool) {
 	p1 := p.Matrix.TransformXY(x, y)
 	p.DoUnitConversion(&p1)
-	p.CreateStdFontText(p1.x, p1.y, txt, p.LastFont, ADegrees, underline, strikethro)
+	p.CreateStdFontText(p1.x, p1.y, txt, p.LastFont, degs, underline, strikethro)
 }
 
-func (p *TPDFPage) WriteText(x, y PDFFloat, txt string) {
+func (p *Page) WriteText(x, y float64, txt string) {
 	p.WriteTextEx(x, y, txt, 0, false, false)
 }

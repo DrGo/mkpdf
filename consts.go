@@ -104,28 +104,6 @@ const (
 	poUTF16info
 )
 
-type ImageCompression int
-
-const (
-	icNone ImageCompression = iota
-	icDeflate
-	icJPEG
-)
-
-type ImageStreamOption int
-
-const (
-	isoCompressed ImageStreamOption = iota
-	isoTransparent
-)
-
-// uses flate pkg constants
-type CompressionLevel int
-
-const (
-	clDefault CompressionLevel = iota
-)
-
 const (
 	cInchToMM                  = 25.4
 	cInchToCM                  = 2.54

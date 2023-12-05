@@ -4,7 +4,7 @@ import "fmt"
 
 type Page struct {
 	DocObj
-	Objects       []Encoder
+	Objects       []Encoder //XObjects 
 	Orientation   PaperOrientation
 	Paper         Paper
 	PaperType     PaperType
@@ -211,8 +211,11 @@ func (p *Page) SetColor(AColor ARGBColor, AStroke bool) {
 // 		}
 // 	}
 // }
-
-// func (p *TPDFPage) DrawImageRawSize(x, Y float64, APixelWidth, APixelHeight, ANumber int, degs float64) {
+//TODO: consider deleting the following 2 funcs
+// func (p *Page) DrawImageRawSizePos(pos Coord, APixelWidth, APixelHeight, ANumber int, degs float64) {
+// 	p.DrawImageRawSize(pos.x, pos.y, APixelWidth, APixelHeight, ANumber, degs)
+// }
+// func (p *Page) DrawImageRawSize(x, Y float64, APixelWidth, APixelHeight, ANumber int, degs float64) {
 // 	p1 := p.Matrix.TransformXY(x, Y)
 // 	p.DoUnitConversion(&p1)
 
@@ -228,38 +231,28 @@ func (p *Page) SetColor(AColor ARGBColor, AStroke bool) {
 // 	}
 // }
 
-// func (p *TPDFPage) DrawImageRawSizePos(pos TPDFCoord, APixelWidth, APixelHeight, ANumber int, degs float64) {
-// 	p.DrawImageRawSize(pos.x, pos.y, APixelWidth, APixelHeight, ANumber, degs)
-// }
 
-// func (p *TPDFPage) DrawImage(x, Y, AWidth, AHeight float64, ANumber int, degs float64) {
-// 	p1 := p.Matrix.TransformXY(x, Y)
-// 	p.DoUnitConversion(&p1)
-// 	p2 := TPDFCoord{AWidth, AHeight}
-// 	p.DoUnitConversion(&p2)
+func (p *Page) DrawImage(x, Y, AWidth, AHeight float64, ANumber int, degs float64) {
+	p1 := p.Matrix.TransformXY(x, Y)
+	p.DoUnitConversion(&p1)
+	p2 := Coord{AWidth, AHeight}
+	p.DoUnitConversion(&p2)
 
-// 	if degs != 0.0 {
-// 		rad := DegToRad(-degs)
-// 		rads, radc := sincos(rad)
-// 		t1 := fmt.Sprintf(PDF_NUMBER_MASK, radc)
-// 		t2 := fmt.Sprintf(PDF_NUMBER_MASK, -rads)
-// 		t3 := fmt.Sprintf(PDF_NUMBER_MASK, rads)
+	if degs != 0.0 {
+		p.addAngle(degs, p1)
+		p.AddObject(NewPDFImage(0, 0, p2.x, p2.y, ANumber))
+	} else {
+		p.AddObject(NewPDFImage(p1.x, p1.y, p2.x, p2.y, ANumber))
+	}
 
-// 		p.AddObject(NewTPDFPushGraphicsStack(p.FDocument))
-// 		p.AddObject(NewTPDFFreeFormString(p.FDocument, fmt.Sprintf("%s %s %s %s %.4f %.4f cm", t1, t2, t3, t1, p1.x, p1.y)))
-// 		p.AddObject(p.FDocument.CreateImage(0, 0, p2.x, p2.y, ANumber))
-// 	} else {
-// 		p.AddObject(p.FDocument.CreateImage(p1.x, p1.y, p2.x, p2.y, ANumber))
-// 	}
+	if degs != 0.0 {
+		p.AddObject(NewTPDFPopGraphicsStack(p.Document))
+	}
+}
 
-// 	if degs != 0.0 {
-// 		p.AddObject(NewTPDFPopGraphicsStack(p.FDocument))
-// 	}
-// }
-
-// func (p *TPDFPage) DrawImagePos(pos TPDFCoord, AWidth, AHeight float64, ANumber int, degs float64) {
-// 	p.DrawImage(pos.x, pos.y, AWidth, AHeight, ANumber, degs)
-// }
+func (p *Page) DrawImagePos(pos Coord, AWidth, AHeight float64, ANumber int, degs float64) {
+	p.DrawImage(pos.x, pos.y, AWidth, AHeight, ANumber, degs)
+}
 
 func (p *Page) addAngle(degrees float64, p1 Coord) {
 	rad := DegToRad(-degrees)
@@ -406,14 +399,14 @@ func (p *Page) GetPaperHeight() float64 {
 	}
 }
 
-// func (p *TPDFPage) HasImages() bool {
-// 	for _, obj := range p.Objects {
-// 		if _, ok := obj.(TPDFImage); ok {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
+func (p *Page) HasImages() bool {
+	for _, obj := range p.Objects {
+		if _, ok := obj.(*TPDFImage); ok {
+			return true
+		}
+	}
+	return false 
+}
 
 func (p *Page) CreateStdFontText(x, Y float64, AText string, AFont *EmbeddedFont, degs float64, AUnderline, AStrikethrough bool) {
 	p.AddObject(NewText(p.Document, x, Y, AText, AFont, degs, AUnderline, AStrikethrough))

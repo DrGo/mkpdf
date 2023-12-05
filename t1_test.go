@@ -52,7 +52,7 @@ func TestCreatePDF(t *testing.T) {
 	pdf.DefaultOrientation = ppoPortrait
 	pdf.DefaultPaperType = ptA4
 	pdf.DefaultUnitOfMeasure = uomMillimeters
-	pdf.FontDirectory = ""
+	pdf.FontDir = ""
 	pdf.StartDocument()
 	sec := pdf.Sections.NewSection("section 1")
 	sec.AddPage(pdf.NewPage())

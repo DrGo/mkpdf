@@ -478,3 +478,25 @@ type LineStyleDef struct {
 	FPenStyle  PenStyle
 	FDashArray DashArray
 }
+
+type TPDFImage struct {
+	Number int
+	Pos    Coord
+	Size   Coord
+}
+
+func NewPDFImage( left, bottom, width, height float64, number int) *TPDFImage {
+	return &TPDFImage{
+		Number:           number,
+		Pos:              Coord{x: left, y: bottom},
+		Size:             Coord{x: width, y: height},
+	}
+}
+func (img *TPDFImage) Encode(st PDFWriter) {
+	st.WriteString(PushGraphicsStack{}.Command() )
+	st.Writef("%f 0 0 %f %f %f cm%s", img.Size.x, img.Size.y, img.Pos.x, img.Pos.y, CRLF)
+	st.Writef("/I%d Do%s", img.Number, CRLF)
+	st.WriteString(PopGraphicsStack{}.Command())
+}
+
+

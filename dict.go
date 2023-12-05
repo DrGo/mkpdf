@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
 // In a PDF dictionary, the key is always name obj, the value can be any object
@@ -10,7 +11,7 @@ type DictionaryItem struct {
 	Value Encoder
 }
 
-func (item DictionaryItem) Name() string { return item.Key.Name }
+// func (item DictionaryItem) Name() string { return item.Key.Name }
 func (item DictionaryItem) Encode(st PDFWriter) {
 	item.Key.Encode(st)
 	st.WriteByte(' ')
@@ -19,21 +20,21 @@ func (item DictionaryItem) Encode(st PDFWriter) {
 }
 
 func NewDictionaryItem(doc *Document, key string, aValue Encoder) DictionaryItem {
-	//FIXME: check that MustEscape should be false
-	return DictionaryItem{NewPDFNameEx( key, false), aValue}
+	//FIXME: check whether MustEscape should be false
+	return DictionaryItem{NewPDFNameEx(key, false), aValue}
 }
 
 // A PDF dictionary holds key/value pairs in any order
 type Dictionary struct {
 	Document *Document
-	Elements []DictionaryItem // list of TPDFDictionaryItem
+	Elements []DictionaryItem
 }
 
 func NewDictionary(doc *Document) *Dictionary { return &Dictionary{Document: doc} }
 
-func (dict *Dictionary) Name() string       { return "" }
-func (dict *Dictionary) ElementCount() int  { return len(dict.Elements) }
-func (dict *Dictionary) Encode(s PDFWriter) { dict.WriteDictionary(-1, s) }
+// func (dict *Dictionary) Name() string       { return "" }
+func (dict *Dictionary) ElementCount() int   { return len(dict.Elements) }
+func (dict *Dictionary) Encode(st PDFWriter) { dict.WriteDictionary(-1, st) }
 func (dict *Dictionary) WriteDictionary(AObject int, st PDFWriter) {
 	var imgCo, fontCo int
 	// var D *TPDFDictionary
@@ -52,42 +53,40 @@ func (dict *Dictionary) WriteDictionary(AObject int, st PDFWriter) {
 		imgCo = -1
 		fontCo = -1
 		for _, E := range dict.Elements {
-			_ = E
 			if AObject > -1 {
-				//if E.Key.FName == "Name" {
-				//	if obj, ok := E.Value.(*TPDFName); ok && obj.FName[0] == 'M' {
-				//		//FIXME: check error
-				//		NumImg, _ = strconv.Atoi(obj.FName[1:])
-				//		ISize = len(dict.Document.FImages[NumImg].StreamedMask)
-				//		D = dict.Document.GlobalXRefs[AObject].Dict
-				//		addSize( ISize)
-				//		dict.LastElement().Encode(st)
-				//		switch dict.Document.FImages[NumImg].FCompressionMask {
-				//		case icJPEG:
-				//			st.WriteString("/Filter /DCTDecode"+CRLF)
-				//		case icDeflate:
-				//			st.WriteString("/Filter /FlateDecode"+CRLF)
-				//		}
-				//		st.WriteString(">>")
-				//		dict.Document.FImages[NumImg].WriteMaskStream(st)
-				//	} else if obj, ok := E.Value.(*TPDFName); ok && obj.FName[0] == 'I' {
-				//		NumImg, _ = strconv.Atoi(obj.FName[1:])
-				//		ISize = len(dict.Document.FImages[NumImg].StreamedData)
-				//		D = dict.Document.GlobalXRefs[AObject].Dict
-				//		addSize( ISize)
-				//		dict.LastElement().Encode(st)
-				//		switch dict.Document.FImages[NumImg].FCompression {
-				//		case icJPEG:
-				//			st.WriteString("/Filter /DCTDecode"+CRLF)
-				//		case icDeflate:
-				//			st.WriteString("/Filter /FlateDecode"+CRLF)
-				//		}
-				//		st.WriteString(">>")
-				//		dict.Document.FImages[NumImg].WriteImageStream(st)
-				//	}
-				//}
-				// if strings.Contains(E.Key.FName, "Length1") {
-				// 	Value = E.Key.FName
+				if E.Key.Name == "Name" {
+					if obj, ok := E.Value.(*PDFName); ok && obj.Name[0] == 'M' {
+						// NumImg, _ = strconv.Atoi(obj.Name[1:])
+						// ISize = len(dict.Document.Images[NumImg].StreamedMask)
+						// D = dict.Document.GlobalXRefs[AObject].Dict
+						// addSize( ISize)
+						// dict.LastElement().Encode(st)
+						// switch dict.Document.Images[NumImg].FCompressionMask {
+						// case icJPEG:
+						// 	st.WriteString("/Filter /DCTDecode"+CRLF)
+						// case icDeflate:
+						// 	st.WriteString("/Filter /FlateDecode"+CRLF)
+						// }
+						// st.WriteString(">>")
+						// dict.Document.Images[NumImg].WriteMaskStream(st)
+					} else if obj, ok := E.Value.(*PDFName); ok && obj.Name[0] == 'I' {
+						NumImg, _ := strconv.Atoi(obj.Name[1:])
+						ISize := len(dict.Document.Images[NumImg].StreamedData)
+						D := dict.Document.GlobalXRefs[AObject].Dict
+						D.AddInteger("Length", ISize)
+						dict.LastElement().Encode(st)
+						switch dict.Document.Images[NumImg].Compression {
+						case icJPEG:
+							st.WriteString("/Filter /DCTDecode" + CRLF)
+						case icDeflate:
+							st.WriteString("/Filter /FlateDecode" + CRLF)
+						}
+						st.WriteString(">>")
+						dict.Document.Images[NumImg].WriteImageStream(st)
+					}
+				}
+				// if strings.Contains(E.Key.Name, "Length1") {
+				// 	Value = E.Key.Name
 				// 	pos := strings.Index(Value, " ")
 				// 	NumFnt, _ = strconv.Atoi(Value[pos+1:])
 				// 	if dict.Document.hasOption(poSubsetFont) {
@@ -127,18 +126,18 @@ func (dict *Dictionary) AddElement(key string, aValue Encoder) *DictionaryItem {
 }
 
 func (dict *Dictionary) AddName(key, aName string) {
-	dict.AddElement(key, NewPDFNameEx( aName, false))
+	dict.AddElement(key, NewPDFNameEx(aName, false))
 }
 
 func (dict *Dictionary) AddNameEscaped(key, aName string) {
-	dict.AddElement(key, NewPDFName( aName))
+	dict.AddElement(key, NewPDFName(aName))
 }
 func (dict *Dictionary) AddInteger(key string, aInteger int) {
-	dict.AddElement(key, NewInteger( aInteger))
+	dict.AddElement(key, NewInteger(aInteger))
 }
 
 func (dict *Dictionary) AddReference(key string, aReference int) {
-	dict.AddElement(key, NewReference( aReference))
+	dict.AddElement(key, NewReference(aReference))
 }
 
 func (dict *Dictionary) AddString(key string, aString string) {

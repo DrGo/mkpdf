@@ -14,16 +14,16 @@ import (
 )
 
 type Document struct {
-	Catalogue          int
-	CurrentColor       string
-	CurrentWidth       string
-	LineCapStyle       LineCapStyle
-	DefaultOrientation PaperOrientation
-	DefaultPaperType   PaperType
-	FontDirectory      string
-	FontFiles          []string
-	Fonts              []*Font
-	// FImages              []*TPDFImage
+	Catalogue            int
+	CurrentColor         string
+	CurrentWidth         string
+	LineCapStyle         LineCapStyle
+	DefaultOrientation   PaperOrientation
+	DefaultPaperType     PaperType
+	FontDir              string
+	FontFiles            []string
+	Fonts                []*Font
+	Images               []*RasterImage
 	Infos                *PDFInfo
 	LineStyleDefs        LineStyleDef
 	Options              []Option
@@ -36,6 +36,7 @@ type Document struct {
 	GlobalXRefs          []*XRef
 	UnitOfMeasure        UnitOfMeasure
 	DefaultUnitOfMeasure UnitOfMeasure
+	ImageStreamOptions   []ImageStreamOption
 }
 
 func NewDocument() *Document {
@@ -79,15 +80,18 @@ func (doc *Document) StartDocument() {
 		doc.CreateTrailerID()
 	}
 	doc.CreatePreferencesEntry()
-	//FIXME:
-	// if doc.FontDirectory == "" {
-	// 	doc.FontDirectory = path.Dir(os.Args[0])
-	// }
+	if doc.FontDir == "" {
+		cwd, err := os.Getwd()
+		if err != nil {
+			doc.FontDir = cwd
+		}
+	}
 }
 
-func (doc *Document) PageCount() int { return len(doc.Pages) }
-func (doc *Document) FontCount() int { return len(doc.Fonts) }
-func (doc *Document) xrefCount() int { return len(doc.GlobalXRefs) }
+func (doc *Document) PageCount() int  { return len(doc.Pages) }
+func (doc *Document) FontCount() int  { return len(doc.Fonts) }
+func (doc *Document) ImageCount() int { return len(doc.Images) }
+func (doc *Document) xrefCount() int  { return len(doc.GlobalXRefs) }
 
 func (doc *Document) NewPage() *Page {
 	doc.Pages = append(doc.Pages, NewPage(doc))
@@ -106,7 +110,7 @@ func (doc *Document) CreateRefTable() {
 }
 
 func (doc *Document) CreateGlobalXRef(typ string) *XRef {
-	xr := NewXRef(doc)	
+	xr := NewXRef(doc)
 	xr.Dict.AddName("Type", typ)
 	doc.AddGlobalXRef(xr)
 	return xr
@@ -119,7 +123,7 @@ func (doc *Document) GetXref(idx int) *XRef {
 func (doc *Document) SaveToWriter(st PDFWriter) error {
 	doc.CreateSectionsOutLine()
 	doc.CreateFontEntries()
-	// doc.CreateImageEntries()
+	doc.CreateImageEntries()
 	doc.Trailer.SetSize(doc.xrefCount())
 	st.WriteString(PDF_VERSION + "\n")
 	st.WriteString(PDF_BINARY_BLOB + "\n")
@@ -203,11 +207,6 @@ func (doc *Document) WriteObject(obj int, st PDFWriter) {
 //     return len(doc.FPatterns) - 1
 // }
 
-// func (d *TPDFDocument) AddImage(AImage *TPDFImage) int {
-//     doc.FImages = append(doc.FImages, AImage)
-//     return len(doc.FImages) - 1
-// }
-
 // func (d *TPDFDocument) AddGraphicState(AGraphicState *TPDFGraphicState) int {
 //     doc.FGraphicStates = append(doc.FGraphicStates, AGraphicState)
 //     return len(doc.FGraphicStates) - 1
@@ -258,7 +257,7 @@ func (doc *Document) CreateInfoEntry(UseUTF16 bool) {
 }
 
 func (doc *Document) CreateMetadataEntry() {
-	xr := doc.CreateGlobalXRef( "Metadata")
+	xr := doc.CreateGlobalXRef("Metadata")
 	xr.Dict.AddName("Subtype", "XML")
 	xr.Stream = NewPDFStream(doc)
 	xr.Stream.AddItem(NewTXMPStream(doc))
@@ -269,7 +268,7 @@ func (doc *Document) CreateMetadataEntry() {
 
 func (doc *Document) AddOutputIntent(subtype, OutCondID, info string, ICCProfile io.Reader) {
 	rxNum := doc.xrefCount()
-	dict := doc.CreateGlobalXRef( "OutputIntent").Dict
+	dict := doc.CreateGlobalXRef("OutputIntent").Dict
 	dict.AddName("S", subtype)
 	dict.AddString("OutputConditionIdentifier", OutCondID)
 	if info != "" {
@@ -287,7 +286,7 @@ func (doc *Document) AddOutputIntent(subtype, OutCondID, info string, ICCProfile
 	if OutputIntents == nil {
 		OutputIntents = doc.GlobalXRefs[doc.Catalogue].Dict.AddElement("OutputIntents", NewArray(doc))
 	}
-	OutputIntents.Value.(*Array).AddItem(NewReference( rxNum))
+	OutputIntents.Value.(*Array).AddItem(NewReference(rxNum))
 }
 
 func (doc *Document) AddPDFA1sRGBOutputIntent() {
@@ -308,13 +307,13 @@ func (doc *Document) CreateTrailerID() {
 }
 
 func (doc *Document) CreatePreferencesEntry() {
-	dict := doc.CreateGlobalXRef( "ViewerPreferences").Dict
-	dict.AddElement("FitWindow", NewBoolean( true))
+	dict := doc.CreateGlobalXRef("ViewerPreferences").Dict
+	dict.AddElement("FitWindow", NewBoolean(true))
 	doc.GlobalXRefs[doc.Catalogue].Dict.AddReference("ViewerPreferences", doc.xrefCount()-1)
 }
 
 func (doc *Document) CreatePagesEntry(Parent int) int {
-	pgdict := doc.CreateGlobalXRef( "Pages").Dict
+	pgdict := doc.CreateGlobalXRef("Pages").Dict
 	xr := doc.xrefCount() - 1
 	pgdict.AddElement("Kids", NewArray(doc))
 	pgdict.AddInteger("Count", 0)
@@ -324,7 +323,7 @@ func (doc *Document) CreatePagesEntry(Parent int) int {
 		pgdict.AddReference("Parent", Parent)
 		dict := doc.GlobalXRefs[Parent].Dict
 		dict.IncCount()
-		dict.AddKid(NewReference( xr))
+		dict.AddKid(NewReference(xr))
 	}
 	return xr
 }
@@ -336,16 +335,16 @@ func (doc *Document) CreatePageEntry(parentNum, pageNum int) int {
 
 	parentDict := doc.GlobalXRefs[parentNum].Dict
 	parentDict.IncCount()
-	parentDict.AddKid(NewReference( doc.xrefCount()-1))
+	parentDict.AddKid(NewReference(doc.xrefCount() - 1))
 
 	arr := NewArray(doc).AddInts(0, 0, pp.Paper.W, pp.Paper.H)
 	pgdict.AddElement("MediaBox", arr)
 	// doc.CreateAnnotEntries(pageNum, pDict)
 	resDict := NewDictionary(doc)
 	arr = NewArray(doc) // procset
-	arr.AddItem(NewPDFName( "PDF"))
-	arr.AddItem(NewPDFName( "Text"))
-	arr.AddItem(NewPDFName( "ImageC"))
+	arr.AddItem(NewPDFName("PDF"))
+	arr.AddItem(NewPDFName("Text"))
+	arr.AddItem(NewPDFName("ImageC"))
 	resDict.AddElement("ProcSet", arr)
 	// fmt.Printf("font count before creating Resource/Font %d\n", doc.FontCount())
 	if doc.FontCount() > 0 {
@@ -360,7 +359,7 @@ func (doc *Document) CreatePageEntry(parentNum, pageNum int) int {
 }
 
 func (doc *Document) CreateOutlines() int {
-	dict := doc.CreateGlobalXRef( "Outlines").Dict
+	dict := doc.CreateGlobalXRef("Outlines").Dict
 	dict.AddInteger("Count", 0)
 	return doc.xrefCount() - 1
 }
@@ -425,7 +424,7 @@ func (doc *Document) CreateStdFont(embeddedFontName string, embeddedFontNum int)
 	dict.AddInteger("FirstChar", 32)
 	dict.AddInteger("LastChar", 255)
 	dict.AddName("BaseFont", embeddedFontName)
-	n := NewPDFName( fmt.Sprintf("F%d", embeddedFontNum))
+	n := NewPDFName(fmt.Sprintf("F%d", embeddedFontNum))
 	dict.AddElement("Name", n)
 	doc.AddFontNameToPages(n.Name, lFontXRef)
 	doc.FontFiles = append(doc.FontFiles, "")
@@ -593,51 +592,6 @@ func (doc *Document) CreateStdFont(embeddedFontName string, embeddedFontNum int)
 //     lXRef.FStream.AddItem(NewTPDFCIDSet(doc, AFontNum))
 // }
 
-// func (doc *TPDFDocument) CreateImageEntry(ImgWidth, ImgHeight, NumImg int) *TPDFDictionary {
-//     lXRef := doc.xrefCount()// reference to be used later
-
-//     ImageDict := doc.CreateGlobalXRef().Dict
-//     ImageDict.AddName("Type", "XObject")
-//     ImageDict.AddName("Subtype", "Image")
-//     ImageDict.AddInteger("Width", ImgWidth)
-//     ImageDict.AddInteger("Height", ImgHeight)
-//     ImageDict.AddName("ColorSpace", "DeviceRGB")
-//     ImageDict.AddInteger("BitsPerComponent", 8)
-//     N := NewPDFName(fmt.Sprintf("I%d", NumImg)) // Needed later
-//     ImageDict.AddElement("Name", N)
-
-//     // now find where we must add the image xref - we are looking for "Resources"
-//     for i := 1; i < doc.xrefCount(); i++ {
-//         ADict := doc.GlobalXRefs[i].Dict
-//         if len(ADict.Values) > 0 {
-//             if val, ok := ADict.Values[0].(*TPDFName); ok && val.Name == "Page" {
-//                 ADict = ADict.ValueByName("Resources").(*TPDFDictionary)
-//                 ADict = ADict.FindValue("XObject").(*TPDFDictionary)
-//                 if ADict != nil {
-//                     ADict.AddReference(N.Name, lXRef)
-//                 }
-//             }
-//         }
-//     }
-
-//     return ImageDict
-// }
-
-// func (doc *TPDFDocument) CreateImageMaskEntry(ImgWidth, ImgHeight, NumImg int, ImageDict *TPDFDictionary) {
-//     lXRef := doc.xrefCount()// reference to be used later
-
-//     MDict := doc.CreateGlobalXRef().Dict
-//     MDict.AddName("Type", "XObject")
-//     MDict.AddName("Subtype", "Image")
-//     MDict.AddInteger("Width", ImgWidth)
-//     MDict.AddInteger("Height", ImgHeight)
-//     MDict.AddName("ColorSpace", "DeviceGray")
-//     MDict.AddInteger("BitsPerComponent", 8)
-//     N := NewPDFName(fmt.Sprintf("M%d", NumImg)) // Needed later
-//     MDict.AddElement("Name", N)
-//     ImageDict.AddReference("SMask", lXRef)
-// }
-
 // func (doc *TPDFDocument) CreateAnnotEntry(APageNum, AnnotNum int) int {
 //     an := doc.Pages[APageNum].Annots[AnnotNum]
 //     lXRef := doc.CreateGlobalXRef()
@@ -697,32 +651,21 @@ func (doc *Document) CreatePageStream(APage *Page, PageNum int) {
 	}
 }
 
-// func (doc *TPDFDocument) ImageStreamOptions() TPDFImageStreamOptions {
-// 	var result TPDFImageStreamOptions
-// 	if doc.Options.contains(poCompressImages) {
-// 		result = append(result, isoCompressed)
-// 	}
-// 	if doc.Options.contains(poUseImageTransparency) {
-// 		result = append(result, isoTransparent)
-// 	}
-// 	return result
-// }
-
 func (doc *Document) CreateSectionPageOutLine(S *Section, PageOutLine, PageIndex, NewPage, ParentOutline, NextOutline, PrevOutLine int) int {
 	aDict := doc.GlobalXRefs[ParentOutline].Dict
 	aDict.IncCount()
 	aDict = doc.GlobalXRefs[PageOutLine].Dict
 	arr := aDict.FindElement("Dest").Value.(*Array)
-	arr.AddItem(NewReference( NewPage))
-	arr.AddItem(NewPDFName( "Fit"))
+	arr.AddItem(NewReference(NewPage))
+	arr.AddItem(NewPDFName("Fit"))
 	result := PrevOutLine
 	if PageIndex == 0 {
 		doc.GlobalXRefs[ParentOutline].Dict.AddReference("First", doc.xrefCount()-1)
 		result = doc.xrefCount() - 1
 		aDict = doc.GlobalXRefs[ParentOutline].Dict
 		arr = aDict.FindElement("Dest").Value.(*Array)
-		arr.AddItem(NewReference( NewPage))
-		arr.AddItem(NewPDFName( "Fit"))
+		arr.AddItem(NewReference(NewPage))
+		arr.AddItem(NewPDFName("Fit"))
 	} else {
 		doc.GlobalXRefs[NextOutline].Dict.AddReference("Next", doc.xrefCount()-1)
 		doc.GlobalXRefs[PageOutLine].Dict.AddReference("Prev", PrevOutLine)
@@ -787,8 +730,8 @@ func (doc *Document) CreateSectionsOutLine() int {
 			if j == 0 && k == 0 {
 				aDict = doc.GlobalXRefs[doc.Catalogue].Dict
 				arr = aDict.FindElement("OpenAction").Value.(*Array)
-				arr.AddItem(NewReference( doc.xrefCount()-1))
-				arr.AddItem(NewPDFNameEx( fmt.Sprintf("XYZ null null %f", float64(doc.ZoomValue/100)), false))
+				arr.AddItem(NewReference(doc.xrefCount() - 1))
+				arr.AddItem(NewPDFNameEx(fmt.Sprintf("XYZ null null %f", float64(doc.ZoomValue/100)), false))
 			}
 			pageNum = doc.CreateContentsEntry(k)
 			doc.CreatePageStream(s.Pages[k], pageNum)
@@ -828,15 +771,6 @@ func (doc *Document) CreateFontEntries() {
 	}
 }
 
-// func (doc *TPDFDocument) CreateImageEntries() {
-// 	for i, image := range Images {
-// 		doc.CreateImageEntry(image.Width, image.Height, i)
-// 		if image.HasMask {
-// 			doc.CreateImageMaskEntry(image.Width, image.Height, i)
-// 		}
-// 	}
-// }
-
 // func (doc *TPDFDocument) CreateAnnotEntries(APageNum int, APageDict *TPDFDictionary) {
 // 	if doc.GetTotalAnnotsCount() == 0 {
 // 		return
@@ -858,26 +792,6 @@ func (doc *Document) WriteXRefTable(st PDFWriter) {
 func (doc *Document) CreateEmbeddedFont(APage *Page, AFontIndex int, AFontSize float64, ASimulateBold, ASimulateItalic bool) *EmbeddedFont {
 	return NewEmbeddedFontEx(doc, APage, AFontIndex, AFontSize, ASimulateBold, ASimulateItalic)
 }
-
-// func (doc *TPDFDocument) CreateText(X, Y float64, AText string, AFont *TPDFEmbeddedFont, ADegrees float64, AUnderline, AStrikethrough bool) *TPDFText {
-// 	return NewTPDFText(doc, X, Y, AText, AFont, ADegrees, AUnderline, AStrikethrough)
-// }
-
-// func (doc *TPDFDocument) CreateUTF8Text(X, Y float64, AText string, AFont *TPDFEmbeddedFont, ADegrees float64, AUnderline, AStrikethrough bool) *TPDFUTF8Text {
-// 	return NewTPDFUTF8Text(doc, X, Y, AText, AFont, ADegrees, AUnderline, AStrikethrough)
-// }
-
-// func (doc *TPDFDocument) CreateUTF16Text(X, Y float64, AText string, AFont *TPDFEmbeddedFont, ADegrees float64, AUnderline, AStrikethrough bool) *TPDFUTF16Text {
-// 	return NewTPDFUTF16Text(doc, X, Y, AText, AFont, ADegrees, AUnderline, AStrikethrough)
-// }
-
-// func (doc *TPDFDocument) CreateRectangle(X, Y, W, H, ALineWidth float64, AFill, AStroke bool) *TPDFRectangle {
-// 	return NewTPDFRectangle(doc, X, Y, W, H, ALineWidth, AFill, AStroke)
-// }
-
-// func (doc *TPDFDocument) CreateRoundedRectangle(X, Y, W, H, ARadius, ALineWidth float64, AFill, AStroke bool) *TPDFRoundedRectangle {
-// 	return NewTPDFRoundedRectangle(doc, X, Y, W, H, ARadius, ALineWidth, AFill, AStroke)
-// }
 
 func (doc *Document) FindFont(AName string) int {
 	for i, f := range doc.Fonts {
@@ -904,7 +818,7 @@ func (doc *Document) AddFont(name, filename string) int {
 	}
 	// non-standard font
 	if path.Dir(filename) == "" { //just a filename
-		filename = filepath.Join(doc.FontDirectory, filename)
+		filename = filepath.Join(doc.FontDir, filename)
 	}
 	f.FontFilename = filename
 	return fontNum
